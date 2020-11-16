@@ -1,0 +1,21 @@
+// Here you can add other styles
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap');
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+
+}
+.sidebar .nav-title {
+    padding: 0.75rem 1rem;
+    font-size: 110%;
+}
+.popover {
+    width: 350px;
+    max-width: 350px;
+}
+popover-container {
+
+}
+.popover-header {
+    font-size: 1rem;
+    font-weight: 600;
+ }
