@@ -19,12 +19,12 @@ def route(api):
                 for i in result:
                     documents[i['no']] = {'no':i['no'], 'contents': i['contents']}
 
-                result = conn.execute("SELECT `documents`.`no`, `code`, `errors`.`text` FROM `documents` JOIN `errors` ON `documents`.`no`=`errors`.`document_no` WHERE `status`=%s", 'verified')
+                result = conn.execute("SELECT `documents`.`no`, `sentence_no`, `code`, `errors`.`text` FROM `documents` JOIN `errors` ON `documents`.`no`=`errors`.`document_no` WHERE `status`=%s", 'verified')
                 
                 for i in result:
                     if ('errors' not in documents[i['no']]):
                         documents[i['no']]['errors'] = []
-                    documents[i['no']]['errors'].append({'code':i['code'], 'keyword':i['text']})
+                    documents[i['no']]['errors'].append({'sentence_no': i['sentence_no'], 'code':i['code'], 'keyword':i['text']})
                 
                 dataset = []
                 for i in documents:

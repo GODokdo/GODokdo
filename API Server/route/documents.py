@@ -118,7 +118,7 @@ def route(api):
                     return {'error' : '문서를 찾지 못함'}, 404
 
                 document = result[0]
-                sql = "SELECT `errors`.`no`, `errors`.`code`, name, text, explanation FROM `errors` join `error_types` on `errors`.`code` = `error_types`.`code` where `document_no`=%s"
+                sql = "SELECT `errors`.`no`, `errors`.`code`, `sentence_no`, name, text, explanation FROM `errors` join `error_types` on `errors`.`code` = `error_types`.`code` where `document_no`=%s"
                 result = conn.execute(sql, (no))
                 if (content_type == 'array'):
                     document['contents'] = document['contents'].split('\n')
@@ -216,23 +216,42 @@ def route(api):
         @documents.response(404, 'Not Found')
         def get(self, no):
             with OpenMysql() as conn:
-                sql = "SELECT `errors`.`no`, `errors`.`code`, name, text, explanation FROM `errors` join `error_types` on `errors`.`code` = `error_types`.`code` where `document_no`=%s"
+                sql = "SELECT `errors`.`no`, `errors`.`code`, `sentence_no`, name, text, explanation FROM `errors` join `error_types` on `errors`.`code` = `error_types`.`code` where `document_no`=%s"
                 result = conn.execute(sql, (no))
                 return {'errors': result}, 200
 
         @as_json
         @login_required(documents)
+        @documents.param('sentence_no', '문장 번호', 'formData')
         @documents.param('code', '오류 코드', 'formData')
         @documents.param('text', '문제가 되는 키워드', 'formData')
         @documents.response(201, 'Created')
         @documents.response(404, 'Not Found')
         @documents.response(409, 'Conflict')
         def post(self, no):
-            data = postData()
+            sentence_no = postDataGet("sentence_no", None)
+            code = postDataGet("code", None)
+            text = postDataGet("text", "").strip()
+            if (sentence_no == None):
+                return {'error': 'sentence_no는 필수로 입력해야합니다.'}, 400
+            if (code == None):
+                return {'error': 'code는 필수로 입력해야합니다.'}, 400
+            if (len(text) == 0):
+                return {'error': 'text는 필수로 입력해야합니다.'}, 400
+            
+            sentence_no = int(sentence_no)
             with OpenMysql() as conn:
-                sql = "INSERT INTO `errors`(`document_no`, `code`, `text`) VALUES (%s, %s, %s);"
+                # 실제 존재하는 키워드인지 확인
+                result = conn.execute("SELECT `contents` FROM `documents` where `no`=%s", (no))
+                if (len(result) == 0):
+                    return {'error' : '문서를 찾지 못함'}, 404
+                sentences = result[0]['contents'].split('\n')
+                if sentences[sentence_no].find(text) == -1:
+                    return {'error' : str(sentence_no) + "번 문장에서 키워드를 찾지 못했습니다."}, 404
+
+                sql = "INSERT INTO `errors`(`document_no`, `sentence_no`, `code`, `text`) VALUES (%s, %s, %s, %s);"
                 try:
-                    conn.execute(sql, (no, data['code'], data['text']))
+                    conn.execute(sql, (no, sentence_no, code, text))
                     created_error_no = conn.cursor.lastrowid
                     conn.execute("UPDATE `documents` SET `updated_time`=CURRENT_TIMESTAMP WHERE `no`=%s", (no))
                     conn.commit()

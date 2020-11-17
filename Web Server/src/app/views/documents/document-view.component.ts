@@ -11,7 +11,7 @@ import { ApiService } from '../../api.service';
 })
 export class DocumentViewComponent implements OnInit {
   errorForm = new FormGroup(
-    { text: new FormControl(''), code: new FormControl(0) }
+    { sentence_no: new FormControl(''), text: new FormControl(''), code: new FormControl(0) }
   );
 
   @ViewChild('primaryModal') public primaryModal: ModalDirective;
@@ -37,7 +37,8 @@ export class DocumentViewComponent implements OnInit {
   errorSubmit() {
     var code = this.errorForm.controls.code.value;
     var text = this.errorForm.controls.text.value;
-    this.api.addDocumentError(this.no, code, text).subscribe((responseBody) => {
+    var sentence_no = this.errorForm.controls.sentence_no.value;
+    this.api.addDocumentError(this.no, sentence_no, code, text).subscribe((responseBody) => {
       this.primaryModal.hide();
       this.Update();
     }, (response) => {
@@ -45,7 +46,8 @@ export class DocumentViewComponent implements OnInit {
       alert(responseBody.error);
     });
   }
-  addError(error_text) {
+  addError(sentence_no, error_text) {
+    this.errorForm.controls.sentence_no.setValue(sentence_no);
     this.errorForm.controls.code.setValue(0);
     this.errorForm.controls.text.setValue(error_text);
 
@@ -65,6 +67,7 @@ export class DocumentViewComponent implements OnInit {
     if (this.tryed) return;
     this.tryed = true;
     this.api.getDocumentFromNo(this.no, "array").subscribe((responseBody) => {
+      this.updated_time = responseBody['document']['updated_time'];
       this.result = responseBody;
       this.contents = []
       if (this.result.document.contents != null) {
@@ -72,16 +75,17 @@ export class DocumentViewComponent implements OnInit {
         for (var sentence_i in this.result.document.contents)
         {
           var sentence = this.result.document.contents[sentence_i]
-          var tags = [{ 'tag': 'text', 'text': sentence }];
+          var tags = [{ 'sentence_no': sentence_i, 'tag': 'text', 'text': sentence }];
           for (var i in errors) {
+            if (errors[i]['sentence_no'] != sentence_i) continue
             var keyword = errors[i]['text'];
             for (var j in tags) { // temp 수정시 다시 처음부터 작동함
               if (tags[j]['tag'] == 'text') {
                 var position = tags[j]['text'].toLowerCase().indexOf(keyword.toLowerCase());
                 if (position == -1) continue;
-                var before = { 'tag': 'text', 'text': tags[j]['text'].substring(0, position) };
-                var now = { 'tag': 'error', 'error': errors[i], 'text': tags[j]['text'].substring(position, position + keyword.length) };
-                var after = { 'tag': 'text', 'text': tags[j]['text'].substring(position + keyword.length) };
+                var before = { 'sentence_no': sentence_i, 'tag': 'text', 'text': tags[j]['text'].substring(0, position) };
+                var now = { 'sentence_no': sentence_i, 'tag': 'error', 'error': errors[i], 'text': tags[j]['text'].substring(position, position + keyword.length) };
+                var after = {  'sentence_no': sentence_i, 'tag': 'text', 'text': tags[j]['text'].substring(position + keyword.length) };
                 tags.splice(Number(j), 1, before, now, after)
               }
             }
@@ -183,7 +187,7 @@ export class DocumentViewComponent implements OnInit {
       if (created != null) {
         this.selected_span = created;
         let elementList = this.elRef.nativeElement.querySelectorAll('span.selected');
-        elementList[1].addEventListener('click', this.addError.bind(this, created.innerText));
+        elementList[1].addEventListener('click', this.addError.bind(this, Number(select.focusNode.parentElement.id.replace("sentence_", "")), created.innerText));
         document.getSelection().empty();
       }
     }
