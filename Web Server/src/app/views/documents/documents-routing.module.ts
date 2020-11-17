@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { DocumentPostComponent } from './document-post.component';
 import { DocumentViewComponent } from './document-view.component';
 import { DocumentsComponent } from './documents.component';
 
@@ -14,6 +15,13 @@ const routes: Routes = [
       {
         path: '',
         redirectTo: 'list'
+      },
+      {
+        path: 'post',
+        component: DocumentPostComponent,
+        data: {
+          title: '분석 작업 요청'
+        }
       },
       {
         path: 'list',

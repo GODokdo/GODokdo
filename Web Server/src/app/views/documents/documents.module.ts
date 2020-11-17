@@ -11,10 +11,11 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { AlertModule } from 'ngx-bootstrap/alert';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ReactiveFormsModule } from '@angular/forms';
+import { DocumentPostComponent } from './document-post.component';
 
 
 @NgModule({
-  declarations: [DocumentsComponent, DocumentViewComponent],
+  declarations: [DocumentsComponent, DocumentViewComponent, DocumentPostComponent],
   imports: [
     CommonModule,
     DocumentsRoutingModule,

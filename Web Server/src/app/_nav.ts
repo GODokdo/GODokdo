@@ -35,7 +35,7 @@ export const navItems: INavData[] = [
   },
   {
     name: 'From Text',
-    url: '/theme/colors',
+    url: '/documents/post',
     icon: 'icon-drop'
   },
   {
