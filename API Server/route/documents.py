@@ -3,6 +3,43 @@ import werkzeug
 werkzeug.cached_property = werkzeug.utils.cached_property
 from flask_restplus import Resource
 from utils import *
+from nltk import tokenize
+def preprocessing_sentences(ori_text):
+    text = ori_text.strip() # 문서 앞뒤 여백 제거
+    text = text.replace("\r","")
+    # 일반적으로 해당 텍스트의 줄이 몇번씩 띄워져있는지 확인
+    writespace = {}
+    space = 0
+    for i in text.split("\n")[1:]:
+        print("S : ", i.strip())
+        if len(i.strip()) != 0: # 내용이 채워진 문장
+            if ((space + 1) not in writespace):
+                writespace[space + 1] = 1
+            else:
+                writespace[space + 1] += 1
+            print(space + 1)
+            space = 0
+        else:
+            space += 1
+    
+    default_space = max(writespace, key=writespace.get)
+    
+    #위의 줄 이상으로 띄워진 단락은 문장이 끝어지지 않았어도 줄바꿈 태그를 제거하지 않음.
+    sentences = []
+    space = 0
+    for i in text.split("\n"):
+        print("S : ", i.strip())
+        if len(i.strip()) != 0: # 내용이 채워진 문장
+            if (default_space < space + 1):
+                sentences.append("[#space_tag]")
+            sentences.append(i.strip())
+            space = 0
+        else:
+            space += 1
+    text = " ".join(sentences) # 모든 문장 이어붙이기
+    texts = [i.strip() for i in tokenize.sent_tokenize(text)]
+    text = "\n".join(texts).replace(" [#space_tag] ", "\n").replace("[#space_tag] ", "\n")
+    return text
 
 def route(api):
     documents  = api.namespace('document', description='잘못된 사실을 기술하고있는 문서를 확인하거나 수정, 추가할 수 있습니다.')
@@ -40,6 +77,8 @@ def route(api):
             url = postDataGet("url", None)
             title = postDataGet("title", None)
             contents = postDataGet("contents", None)
+            if contents is not None:
+                contents = preprocessing_sentences(contents)
             status = "collected"
             with OpenMysql() as conn:
                 sql = "INSERT INTO `documents`(url, title, contents, status) VALUES (%s, %s, %s, %s);"
@@ -109,6 +148,10 @@ def route(api):
             status = postDataGet("status", "")
             title = postDataGet("title", "")
             contents = postDataGet("contents", "")
+            
+            if len(contents) != 0:
+                contents = preprocessing_sentences(contents)
+
             if len(status) == 0:
                 return {'error': 'status는 필수로 입력해야합니다.'}, 400
             if status not in can_status:

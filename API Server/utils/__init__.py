@@ -11,6 +11,9 @@ def postData():
 def postDataGet(key, default=None):
     data = postData()
     if key in data:
+        if type(data[key]) is str and len(data[key]) == 0:
+            return default
+
         return data[key]
     else:
         return default
