@@ -64,28 +64,31 @@ export class DocumentViewComponent implements OnInit {
   Update() {
     if (this.tryed) return;
     this.tryed = true;
-    this.api.getDocumentFromNo(this.no).subscribe((responseBody) => {
+    this.api.getDocumentFromNo(this.no, "array").subscribe((responseBody) => {
       this.result = responseBody;
+      this.contents = []
       if (this.result.document.contents != null) {
-        this.contents = [{ 'tag': 'text', 'text': this.result.document.contents }];
         var errors = this.result.errors;
-        for (var i in errors) {
-          var keyword = errors[i]['text'];
-          for (var j in this.contents) { // temp 수정시 다시 처음부터 작동함
-            if (this.contents[j]['tag'] == 'text') {
-              var position = this.contents[j]['text'].indexOf(keyword);
-              console.log(this.contents[j]['text'])
-              console.log(keyword)
-              if (position == -1) continue;
-              var before = { 'tag': 'text', 'text': this.contents[j]['text'].substring(0, position) };
-              var now = { 'tag': 'error', 'error': errors[i], 'text': this.contents[j]['text'].substring(position, position + keyword.length) };
-              var after = { 'tag': 'text', 'text': this.contents[j]['text'].substring(position + keyword.length) };
-
-              this.contents.splice(Number(j), 1, before, now, after)
-
+        for (var sentence_i in this.result.document.contents)
+        {
+          var sentence = this.result.document.contents[sentence_i]
+          var tags = [{ 'tag': 'text', 'text': sentence }];
+          for (var i in errors) {
+            var keyword = errors[i]['text'];
+            for (var j in tags) { // temp 수정시 다시 처음부터 작동함
+              if (tags[j]['tag'] == 'text') {
+                var position = tags[j]['text'].toLowerCase().indexOf(keyword.toLowerCase());
+                if (position == -1) continue;
+                var before = { 'tag': 'text', 'text': tags[j]['text'].substring(0, position) };
+                var now = { 'tag': 'error', 'error': errors[i], 'text': tags[j]['text'].substring(position, position + keyword.length) };
+                var after = { 'tag': 'text', 'text': tags[j]['text'].substring(position + keyword.length) };
+                tags.splice(Number(j), 1, before, now, after)
+              }
             }
           }
+          this.contents.push(tags)
         }
+        console.log(this.contents)
       }
     }, (error) => { }, () => {
       this.tryed = false;

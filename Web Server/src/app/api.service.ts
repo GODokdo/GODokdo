@@ -22,8 +22,8 @@ export class ApiService {
     return this.httpClient.get("https://api.easylab.kr/document", { 'headers': { 'authorization': authorization } });
   }
 
-  getDocumentFromNo(no) {
-    return this.httpClient.get("https://api.easylab.kr/document/" + no, { 'headers': { 'authorization': authorization } });
+  getDocumentFromNo(no, content_type="string") {
+    return this.httpClient.get("https://api.easylab.kr/document/" + no, { 'headers': { 'authorization': authorization }, 'params':{'content-type':content_type} });
   }
 
   getDocumentStatus(no) {

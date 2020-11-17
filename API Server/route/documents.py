@@ -109,7 +109,9 @@ def route(api):
     class Resource_documents_no(Resource):
         @as_json
         @login_required(documents)
+        @documents.param('content-type', '문서의 내용을 string으로 받을지, array로 받을지 결정')
         def get(self, no):
+            content_type = queryDataGet('content-type', 'string')
             with OpenMysql() as conn:
                 sql = "SELECT * FROM `documents` where `no`=%s"
                 result = conn.execute(sql, (no))
@@ -119,8 +121,10 @@ def route(api):
                 document = result[0]
                 sql = "SELECT `errors`.`no`, `errors`.`code`, name, text, explanation FROM `errors` join `error_types` on `errors`.`code` = `error_types`.`code` where `document_no`=%s"
                 result = conn.execute(sql, (no))
-
-                return {'document' : document, 'errors': result}, 200
+                if (content_type == 'array'):
+                    document['contents'] = document['contents'].split('\n')
+                
+                return {'document' : document, 'errors': result, 'content-type':content_type}, 200
 
         @as_json
         @login_required(documents)
