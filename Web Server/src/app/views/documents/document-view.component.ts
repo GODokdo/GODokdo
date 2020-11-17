@@ -113,11 +113,16 @@ export class DocumentViewComponent implements OnInit {
 
     return `${Math.floor(betweenTimeDay / 365)}년 전`;
   }
-
+  interval = null;
+  ngOnDestroy() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+  }
   updated_time = null;
   ngOnInit(): void {
     this.Update();
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.api.getDocumentStatus(this.no).subscribe((responseBody) => {
         if (this.updated_time != responseBody['updated_time']) {
           this.updated_time = responseBody['updated_time'];
