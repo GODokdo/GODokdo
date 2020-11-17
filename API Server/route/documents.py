@@ -8,29 +8,28 @@ def preprocessing_sentences(ori_text):
     text = ori_text.strip() # 문서 앞뒤 여백 제거
     text = text.replace("\r","")
     # 일반적으로 해당 텍스트의 줄이 몇번씩 띄워져있는지 확인
-    writespace = {}
+    linespace = {}
     space = 0
     for i in text.split("\n")[1:]:
-        print("S : ", i.strip())
         if len(i.strip()) != 0: # 내용이 채워진 문장
-            if ((space + 1) not in writespace):
-                writespace[space + 1] = 1
+            if ((space + 1) not in linespace):
+                linespace[space + 1] = 1
             else:
-                writespace[space + 1] += 1
-            print(space + 1)
+                linespace[space + 1] += 1
             space = 0
         else:
             space += 1
     
-    default_space = max(writespace, key=writespace.get)
-    
+    # default_space = max(linespace, key=linespace.get) # 한 문장일때 에러남
+    # 강제 지정
+    default_space = 2
     #위의 줄 이상으로 띄워진 단락은 문장이 끝어지지 않았어도 줄바꿈 태그를 제거하지 않음.
     sentences = []
     space = 0
     for i in text.split("\n"):
-        print("S : ", i.strip())
+        print("S : ", i.strip(), len(i.strip()))
         if len(i.strip()) != 0: # 내용이 채워진 문장
-            if (default_space < space + 1):
+            if (default_space <= space + 1):
                 sentences.append("[#space_tag]")
             sentences.append(i.strip())
             space = 0
@@ -38,7 +37,7 @@ def preprocessing_sentences(ori_text):
             space += 1
     text = " ".join(sentences) # 모든 문장 이어붙이기
     texts = [i.strip() for i in tokenize.sent_tokenize(text)]
-    text = "\n".join(texts).replace(" [#space_tag] ", "\n").replace("[#space_tag] ", "\n")
+    text = "\n".join(texts).replace(" [#space_tag] ", "\n\n").replace("\n[#space_tag] ", "\n\n")
     return text
 
 def route(api):
