@@ -33,4 +33,8 @@ export class ApiService {
   addDocumentFromText(title, contents) {
     return this.httpClient.post("https://api.easylab.kr/document", { "title": title, "contents": contents }, { 'headers': { 'authorization': authorization } });
   }
+
+  translate(text, src = "", dest = "") {
+    return this.httpClient.get("https://api.easylab.kr/translate/from/google", { 'headers': { 'authorization': authorization }, 'params':{'src':src, 'dest': src, 'text':text}});
+  }
 }

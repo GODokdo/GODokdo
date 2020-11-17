@@ -62,13 +62,26 @@ export class DocumentViewComponent implements OnInit {
   public result = null;
   public error_codes = [];
   public contents = [];
+  public translate_contents = [];
   public tryed = false;
+  public previous_contents = "";
   Update() {
     if (this.tryed) return;
     this.tryed = true;
     this.api.getDocumentFromNo(this.no, "array").subscribe((responseBody) => {
       this.updated_time = responseBody['document']['updated_time'];
       this.result = responseBody;
+      if (this.previous_contents != String(this.result.document.contents))
+      {
+        this.previous_contents = String(this.result.document.contents);
+
+        this.result.document.contents.forEach((sentence, index) => {
+          this.api.translate(sentence).subscribe((responseBody) => {
+            console.log(index)
+            this.translate_contents[index] = responseBody['translated']
+          });
+        });
+      }
       this.contents = []
       if (this.result.document.contents != null) {
         var errors = this.result.errors;

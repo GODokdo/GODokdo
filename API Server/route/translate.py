@@ -39,17 +39,33 @@ def route(api):
         @translate.param('text', '번역할 문장')
         @translate.response(200, 'OK')
         def get(self):
-            src = request.args.get('src', None)
-            dest = request.args.get('dest', 'ko')
-            text = request.args.get('text', "")
-            if src is None:
-                translated = google_translate(text, dest=dest)
-            else:
+            src = queryDataGet('src', default='en')
+            dest = queryDataGet('dest', default='ko')
+            text = queryDataGet('text', default="").strip()
+            if len(text) == 0:
+                return {
+                    "src": src,
+                    "dest": dest,
+                    "origin": "", 
+                    "translated": ""
+                }, 200
+            with OpenMysql() as conn:
+                result = conn.execute("SELECT `translated` FROM `translate` where `api`=%s and `src`=%s and `dest`=%s and `origin`=%s", ('google',src,dest,text))
+                if len(result) != 0:
+                    return {
+                        "src": src,
+                        "dest": dest,
+                        "origin": text, 
+                        "translated": result[0]['translated']
+                    }, 200
                 translated = google_translate(text, src=src, dest=dest)
-            return {
-                "src": translated.src,
-                "dest": translated.dest,
-                "origin": translated.origin, 
-                "translated": translated.text,
-                "pronunciation": translated.pronunciation
-            }, 200
+                sql = "INSERT INTO `translate`(`api`, `src`, `dest`, `origin`, `translated`) VALUES (%s, %s, %s, %s, %s)"
+                if text != translated.text:
+                    result = conn.execute(sql, ('google', src, dest, text, translated.text))
+                    conn.commit()
+                return {
+                    "src": translated.src,
+                    "dest": translated.dest,
+                    "origin": translated.origin, 
+                    "translated": translated.text
+                }, 200

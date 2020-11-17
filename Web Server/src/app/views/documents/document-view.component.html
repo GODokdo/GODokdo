@@ -111,13 +111,17 @@
       </div>
     </tab>
     <tab>
-      <ng-template tabHeading><i class="icon-calculator"></i> 한국어 &nbsp;<span class="badge badge-success">New</span>
+      <ng-template tabHeading><i class="icon-calculator"></i> 한국어로 보기 &nbsp;<span class="badge badge-success">New</span>
       </ng-template>
-      2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-      dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-      nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim
-      id est laborum.
+      <div>
+        <span *ngFor="let sentence of contents" class="sentence">
+          <div *ngIf="sentence.length != 1 || sentence[0]['text'].length != 0">
+            <div *ngFor="let item of sentence" style="display: inline;" class="text" [id]="'sentence_' + item.sentence_no"><span *ngIf="item.tag == 'text'" class="text">{{item.text}}</span><span *ngIf="item.tag == 'error'" class="text h" [popover]="popTemplateHtml" [popoverTitle]="item.error.name">{{item.text}}</span></div>
+            <br>{{translate_contents[sentence[0].sentence_no]}}
+          </div>
+          <br>
+        </span>
+      </div>
     </tab>
     <tab>
       <ng-template tabHeading><i class="icon-calculator"></i> 이미지
