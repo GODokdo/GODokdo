@@ -34,6 +34,10 @@ export class DocumentViewComponent implements OnInit {
     if (this.result.document.status == "labeled") return 3;
     if (this.result.document.status == "verified") return 5;
   }
+  UpdateStatus(status) {
+    this.api.modifyDocumentFromText(this.no, status).subscribe((responeBody) => {this.Update()});
+  }
+
   errorSubmit() {
     var code = this.errorForm.controls.code.value;
     var position = this.errorForm.controls.position.value;

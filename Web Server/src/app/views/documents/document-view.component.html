@@ -101,6 +101,7 @@
       <div [collapse]="isCollapsed">
         <ng-template tabHeading><i class="icon-list"></i> 원문 (영어)</ng-template>
         <alert type="success" dismissible="true" *ngIf="getStatusLevel() == 1"><i class="fa fa-info-circle"></i> 서버에서 페이지 내용을 수집중입니다. 조금만 기다리면 자동으로 페이지에 반영됩니다.</alert>
+        <alert type="success" dismissible="true" *ngIf="getStatusLevel() == 2"><i class="fa fa-info-circle"></i> 서버에서 인공지능을 통해 오류 표기를 검출하고 있습니다. 조금만 기다리면 자동으로 페이지에 반영됩니다.</alert>
         <alert type="danger" dismissible="true" *ngIf="getStatusLevel() > 2"><i class="fa fa-warning"></i> 혹시 검출되지 않은 표기 오류가 있나요? 문제가 있는 텍스트를 드래그하여 오류
           표시를 추가할 수 있습니다.</alert>
         <ng-template #popTemplateHtml>여기다가 간단한 설명 + '더보기' 메뉴 표시
@@ -135,6 +136,13 @@
         <button type="button" class="btn btn-primary" (click)="isCollapsed = !isCollapsed">
           <div *ngIf="isCollapsed">원문 펴기</div>
           <div *ngIf="!isCollapsed">원문 접기</div>
+        </button>
+
+        <button type="button" class="btn btn-success"  *ngIf="getStatusLevel() == 2" (click)="UpdateStatus('labeled')">
+          인공지능 오류 검출 생략
+        </button>
+        <button type="button" class="btn btn-success"  *ngIf="getStatusLevel() == 3" (click)="UpdateStatus('verified')">
+          분류 완료 상태로 표시
         </button>
       </div>
   </tabset>
