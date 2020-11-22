@@ -14,8 +14,8 @@ export class ApiService {
     return this.httpClient.get("https://api.easylab.kr/error", { 'headers': { 'authorization': authorization } });
   }
 
-  addDocumentError(no, code,sentence_no, position, length) {
-    return this.httpClient.post("https://api.easylab.kr/document/" + no + "/error", { "sentence_no":sentence_no, "code": code, "position": position, "length":length }, { 'headers': { 'authorization': authorization } });
+  addDocumentError(no, code,sentence_no, position, length, text) {
+    return this.httpClient.post("https://api.easylab.kr/document/" + no + "/error", { "sentence_no":sentence_no, "code": code, "position": position, "length":length, "text":text }, { 'headers': { 'authorization': authorization } });
   }
 
   getDocumentList() {

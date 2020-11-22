@@ -39,7 +39,8 @@ export class DocumentViewComponent implements OnInit {
     var position = this.errorForm.controls.position.value;
     var length = this.errorForm.controls.length.value;
     var sentence_no = this.errorForm.controls.sentence_no.value;
-    this.api.addDocumentError(this.no, code, sentence_no, position, length).subscribe((responseBody) => {
+    var text = this.errorForm.controls.text.value;
+    this.api.addDocumentError(this.no, code, sentence_no, position, length, text).subscribe((responseBody) => {
       this.primaryModal.hide();
       this.Update();
     }, (response) => {

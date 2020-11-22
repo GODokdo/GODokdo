@@ -254,6 +254,7 @@ def route(api):
         @documents.param('code', '오류 코드', 'formData')
         @documents.param('position', '키워드 위치', 'formData')
         @documents.param('length', '키워드 길이', 'formData')
+        @documents.param('text', '입력 텍스트(검증)', 'formData')
         @documents.response(201, 'Created')
         @documents.response(404, 'Not Found')
         @documents.response(409, 'Conflict')
@@ -287,7 +288,10 @@ def route(api):
                 sentences = result[0]['contents'].split('\n')
                 if len(sentences[sentence_no]) <= position + length:
                     return {'error' : "position + length 길이가 문장 길이를 초과합니다."}, 404
-                text = sentences[sentence_no][position:position + length]
+                text_predicted = sentences[sentence_no][position:position + length]
+                if text != text_predicted:
+                    return {'error': 'position, length 정보와 입력된 키워드가 일치하지 않습니다.'}, 400
+
                 sql = "INSERT INTO `errors`(`document_no`, `sentence_no`, `code`, `position`, `length`, `text`) VALUES (%s, %s, %s, %s, %s, %s);"
                 try:
                     conn.execute(sql, (no, sentence_no, code, position, length, text))
