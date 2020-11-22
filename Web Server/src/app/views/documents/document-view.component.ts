@@ -11,7 +11,7 @@ import { ApiService } from '../../api.service';
 })
 export class DocumentViewComponent implements OnInit {
   errorForm = new FormGroup(
-    { sentence_no: new FormControl(''), text: new FormControl(''), code: new FormControl(0) }
+    { sentence_no: new FormControl(''), text: new FormControl(''), code: new FormControl(0), position: new FormControl(0), length: new FormControl(0) }
   );
 
   @ViewChild('primaryModal') public primaryModal: ModalDirective;
@@ -36,9 +36,10 @@ export class DocumentViewComponent implements OnInit {
   }
   errorSubmit() {
     var code = this.errorForm.controls.code.value;
-    var text = this.errorForm.controls.text.value;
+    var position = this.errorForm.controls.position.value;
+    var length = this.errorForm.controls.length.value;
     var sentence_no = this.errorForm.controls.sentence_no.value;
-    this.api.addDocumentError(this.no, sentence_no, code, text).subscribe((responseBody) => {
+    this.api.addDocumentError(this.no, code, sentence_no, position, length).subscribe((responseBody) => {
       this.primaryModal.hide();
       this.Update();
     }, (response) => {
@@ -46,10 +47,13 @@ export class DocumentViewComponent implements OnInit {
       alert(responseBody.error);
     });
   }
-  addError(sentence_no, error_text) {
+  addError(sentence_no, error_text, position) {
+    error_text = error_text.trim()
     this.errorForm.controls.sentence_no.setValue(sentence_no);
     this.errorForm.controls.code.setValue(0);
     this.errorForm.controls.text.setValue(error_text);
+    this.errorForm.controls.position.setValue(position);
+    this.errorForm.controls.length.setValue(error_text.length);
 
     this.api.getErrorCodeList().subscribe((responseBody) => {
       this.error_codes = responseBody['list'];
@@ -85,21 +89,26 @@ export class DocumentViewComponent implements OnInit {
       this.contents = []
       if (this.result.document.contents != null) {
         var errors = this.result.errors;
+        errors = errors.sort(function (a, b): any {
+            const dataA = a['position'];
+            const dataB = b['position'];
+            return dataB > dataA ? 1 : dataB < dataA ? -1 : 0; //sort by date decending
+        });
+        console.log(errors)
         for (var sentence_i in this.result.document.contents)
         {
           var sentence = this.result.document.contents[sentence_i]
-          var tags = [{ 'sentence_no': sentence_i, 'tag': 'text', 'text': sentence }];
+          var tags = [{ 'offset':0, 'sentence_no': sentence_i, 'tag': 'text', 'text': sentence }];
           for (var i in errors) {
             if (errors[i]['sentence_no'] != sentence_i) continue
-            var keyword = errors[i]['text'];
             for (var j in tags) { // temp 수정시 다시 처음부터 작동함
               if (tags[j]['tag'] == 'text') {
-                var position = tags[j]['text'].toLowerCase().indexOf(keyword.toLowerCase());
-                if (position == -1) continue;
-                var before = { 'sentence_no': sentence_i, 'tag': 'text', 'text': tags[j]['text'].substring(0, position) };
-                var now = { 'sentence_no': sentence_i, 'tag': 'error', 'error': errors[i], 'text': tags[j]['text'].substring(position, position + keyword.length) };
-                var after = {  'sentence_no': sentence_i, 'tag': 'text', 'text': tags[j]['text'].substring(position + keyword.length) };
+                // var position = tags[j]['text'].toLowerCase().indexOf(keyword.toLowerCase());
+                var before = { 'offset': tags[j]['offset'], 'sentence_no': sentence_i, 'tag': 'text', 'text': tags[j]['text'].substring(0, errors[i]['position']) };
+                var now = { 'offset': tags[j]['offset'] + errors[i]['position'], 'sentence_no': sentence_i, 'tag': 'error', 'error': errors[i], 'text': tags[j]['text'].substring(errors[i]['position'], errors[i]['position'] + errors[i]['length']) };
+                var after = {  'offset': tags[j]['offset'] + errors[i]['position'] + errors[i]['length'], 'sentence_no': sentence_i, 'tag': 'text', 'text': tags[j]['text'].substring(errors[i]['position'] + errors[i]['length']) };
                 tags.splice(Number(j), 1, before, now, after)
+                break
               }
             }
           }
@@ -151,12 +160,14 @@ export class DocumentViewComponent implements OnInit {
       });
     }, 1000);
     document.onmouseup = () => {
+      var start = 0;
       var created = null;
       var select = this.selectText();
       if (select.focusNode != null &&
         select.focusNode.parentElement.classList.contains("text")
         && select.toString().length != 0) {
         if (select.rangeCount) {
+          
           var range = document.createRange();
           range.setStart(select.anchorNode, select.anchorOffset);
           range.setEnd(select.focusNode, select.focusOffset);
@@ -188,6 +199,18 @@ export class DocumentViewComponent implements OnInit {
           range.surroundContents(created);
           select.removeAllRanges();
           select.addRange(range);
+          console.log(range);
+          var sentence_no = Number(select.focusNode.parentElement.id.replace("sentence_", ""));
+          for (var i in this.contents[sentence_no]) {
+            if (this.contents[sentence_no][i]['tag'] == 'text') {
+              var find = this.contents[sentence_no][i]['text'].toLowerCase().indexOf(select.toString().toLowerCase());
+              if (find != -1) {
+                start = this.contents[sentence_no][i]['offset'] + find;
+              }
+
+            }
+          }
+          console.log(start)
         }
       }
 
@@ -200,7 +223,8 @@ export class DocumentViewComponent implements OnInit {
       if (created != null) {
         this.selected_span = created;
         let elementList = this.elRef.nativeElement.querySelectorAll('span.selected');
-        elementList[1].addEventListener('click', this.addError.bind(this, Number(select.focusNode.parentElement.id.replace("sentence_", "")), created.innerText));
+
+        elementList[1].addEventListener('click', this.addError.bind(this, Number(select.focusNode.parentElement.id.replace("sentence_", "")), created.innerText, start));
         document.getSelection().empty();
       }
     }

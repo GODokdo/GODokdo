@@ -14,6 +14,10 @@
             <div class="form-group">
               <label for="error_text">선택된 문장 번호</label>
               <input type="text" class="form-control" disabled formControlName="sentence_no">
+              
+              <input type="hidden" class="form-control" disabled formControlName="position">
+              
+              <input type="hidden" class="form-control" disabled formControlName="length">
             </div>
           </div>
         </div><!--/.row-->
@@ -22,7 +26,7 @@
           <div class="col-sm-12">
             <div class="form-group">
               <label for="error_text">표기 오류</label>
-              <input type="text" class="form-control" placeholder="잘못된 키워드 혹은 문장을 입력해주세요" formControlName="text">
+              <input type="text" class="form-control" placeholder="잘못된 키워드 혹은 문장을 입력해주세요" formControlName="text" disabled>
             </div>
           </div>
         </div><!--/.row-->
