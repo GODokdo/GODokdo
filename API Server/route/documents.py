@@ -27,7 +27,11 @@ def reset():
         
         conn.commit()
 
-
+def preprocessing_url(url):
+    length = len(url)
+    if url[length-1] == '/':
+        url = url[0:length-1]
+    return url
 
 def preprocessing_sentences(ori_text):
     text = ori_text.strip() # 문서 앞뒤 여백 제거
@@ -103,6 +107,10 @@ def route(api):
             contents = postDataGet("contents", None)
             if contents is not None:
                 contents = preprocessing_sentences(contents)
+
+            if url is not None:
+                url = preprocessing_url(url)
+
             status = "collected"
             with OpenMysql() as conn:
                 sql = "INSERT INTO `documents`(url, title, contents, status) VALUES (%s, %s, %s, %s);"
@@ -286,11 +294,16 @@ def route(api):
                 if (len(result) == 0):
                     return {'error' : '문서를 찾지 못함'}, 404
                 sentences = result[0]['contents'].split('\n')
-                if len(sentences[sentence_no]) <= position + length:
+                if len(sentences[sentence_no]) < position + length:
                     return {'error' : "position + length 길이가 문장 길이를 초과합니다."}, 404
                 text_predicted = sentences[sentence_no][position:position + length]
                 if text != text_predicted:
-                    return {'error': 'position, length 정보와 입력된 키워드가 일치하지 않습니다.'}, 400
+                    print('sentence_no', sentence_no)
+                    print('position', position)
+                    print('length', length)
+                    print('text_predicted', text_predicted)
+                    print('text', text)
+                    return {'error': 'position, length 정보와 입력된 키워드가 일치하지 않습니다. (' + text_predicted + ')', 'text_predicted':text_predicted}, 400
 
                 sql = "INSERT INTO `errors`(`document_no`, `sentence_no`, `code`, `position`, `length`, `text`) VALUES (%s, %s, %s, %s, %s, %s);"
                 try:
