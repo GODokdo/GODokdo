@@ -14,8 +14,8 @@ export class ApiService {
     return this.httpClient.get("https://api.easylab.kr/error", { 'headers': { 'authorization': authorization } });
   }
 
-  addDocumentError(no, sentence_no, code, text) {
-    return this.httpClient.post("https://api.easylab.kr/document/" + no + "/error", { "sentence_no":sentence_no, "code": code, "text": text }, { 'headers': { 'authorization': authorization } });
+  addDocumentError(no, code,sentence_no, position, length, text) {
+    return this.httpClient.post("https://api.easylab.kr/document/" + no + "/error", { "sentence_no":sentence_no, "code": code, "position": position, "length":length, "text":text }, { 'headers': { 'authorization': authorization } });
   }
 
   getDocumentList() {
@@ -32,6 +32,10 @@ export class ApiService {
 
   addDocumentFromText(title, contents) {
     return this.httpClient.post("https://api.easylab.kr/document", { "title": title, "contents": contents }, { 'headers': { 'authorization': authorization } });
+  }
+
+  modifyDocumentFromText(no, status) {
+    return this.httpClient.put("https://api.easylab.kr/document/" + no, { "status": status}, { 'headers': { 'authorization': authorization } });
   }
 
   translate(text, src = "", dest = "") {

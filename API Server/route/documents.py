@@ -4,6 +4,31 @@ werkzeug.cached_property = werkzeug.utils.cached_property
 from flask_restplus import Resource
 from utils import *
 from nltk import tokenize
+
+def reset():
+    with OpenMysql() as conn:
+        sql = "SELECT * FROM `documents` ORDER BY `no` DESC"
+        result = conn.execute(sql)
+        
+        for i in result:
+            no = i['no']
+            contents = i['contents'].split('\n')
+
+            
+            sql = "SELECT `errors`.`no`, `sentence_no`, text  FROM `errors` where `document_no`=%s"
+            errors = conn.execute(sql, (no))
+            for error in errors:
+                start = contents[error['sentence_no']].find(error['text'])
+                length = len(error['text'])
+                
+                conn.execute("UPDATE `errors` SET `position`=%s, `length`=%s WHERE `no`=%s", (start, length, error['no']))
+                if (start == -1 or length == 0):
+                    1 / 0
+        
+        conn.commit()
+
+
+
 def preprocessing_sentences(ori_text):
     text = ori_text.strip() # 문서 앞뒤 여백 제거
     text = text.replace("\r","")
@@ -73,7 +98,7 @@ def route(api):
         @documents.response(201, 'OK')
         @documents.response(409, 'Conflict')
         def post(self):
-            url = postDataGet("url", None)
+            url = postDataGet("title", None)
             title = postDataGet("title", None)
             contents = postDataGet("contents", None)
             if contents is not None:
@@ -118,10 +143,13 @@ def route(api):
                     return {'error' : '문서를 찾지 못함'}, 404
 
                 document = result[0]
-                sql = "SELECT `errors`.`no`, `errors`.`code`, `sentence_no`, name, text, explanation FROM `errors` join `error_types` on `errors`.`code` = `error_types`.`code` where `document_no`=%s"
+                sql = "SELECT `errors`.`no`, `errors`.`code`, `sentence_no`, name, text, explanation, `position`, `length` FROM `errors` join `error_types` on `errors`.`code` = `error_types`.`code` where `document_no`=%s"
                 result = conn.execute(sql, (no))
                 if (content_type == 'array'):
-                    document['contents'] = document['contents'].split('\n')
+                    if (document['contents'] is None):
+                        document['contents'] = []
+                    else:
+                        document['contents'] = document['contents'].split('\n')
                 
                 return {'document' : document, 'errors': result, 'content-type':content_type}, 200
 
@@ -216,7 +244,7 @@ def route(api):
         @documents.response(404, 'Not Found')
         def get(self, no):
             with OpenMysql() as conn:
-                sql = "SELECT `errors`.`no`, `errors`.`code`, `sentence_no`, name, text, explanation FROM `errors` join `error_types` on `errors`.`code` = `error_types`.`code` where `document_no`=%s"
+                sql = "SELECT `errors`.`no`, `errors`.`code`, `sentence_no`, `position`, `length`, name, text, explanation FROM `errors` join `error_types` on `errors`.`code` = `error_types`.`code` where `document_no`=%s"
                 result = conn.execute(sql, (no))
                 return {'errors': result}, 200
 
@@ -224,7 +252,9 @@ def route(api):
         @login_required(documents)
         @documents.param('sentence_no', '문장 번호', 'formData')
         @documents.param('code', '오류 코드', 'formData')
-        @documents.param('text', '문제가 되는 키워드', 'formData')
+        @documents.param('position', '키워드 위치', 'formData')
+        @documents.param('length', '키워드 길이', 'formData')
+        @documents.param('text', '입력 텍스트(검증)', 'formData')
         @documents.response(201, 'Created')
         @documents.response(404, 'Not Found')
         @documents.response(409, 'Conflict')
@@ -232,12 +262,22 @@ def route(api):
             sentence_no = postDataGet("sentence_no", None)
             code = postDataGet("code", None)
             text = postDataGet("text", "").strip()
+            position = postDataGet("position", None)
+            length = postDataGet("length", None)
             if (sentence_no == None):
                 return {'error': 'sentence_no는 필수로 입력해야합니다.'}, 400
             if (code == None):
                 return {'error': 'code는 필수로 입력해야합니다.'}, 400
-            if (len(text) == 0):
-                return {'error': 'text는 필수로 입력해야합니다.'}, 400
+                
+            if (position is None):
+                return {'error': 'position은 필수로 입력해야합니다.'}, 400
+            if (length is None):
+                return {'error': 'length는 필수로 입력해야합니다.'}, 400
+                
+            if (position < 0):
+                return {'error': 'position은 양수만 허용됩니다.'}, 400
+            if (length < 0):
+                return {'error': 'length는 양수만 허용됩니다.'}, 400
             
             sentence_no = int(sentence_no)
             with OpenMysql() as conn:
@@ -246,12 +286,15 @@ def route(api):
                 if (len(result) == 0):
                     return {'error' : '문서를 찾지 못함'}, 404
                 sentences = result[0]['contents'].split('\n')
-                if sentences[sentence_no].find(text) == -1:
-                    return {'error' : str(sentence_no) + "번 문장에서 키워드를 찾지 못했습니다."}, 404
+                if len(sentences[sentence_no]) <= position + length:
+                    return {'error' : "position + length 길이가 문장 길이를 초과합니다."}, 404
+                text_predicted = sentences[sentence_no][position:position + length]
+                if text != text_predicted:
+                    return {'error': 'position, length 정보와 입력된 키워드가 일치하지 않습니다.'}, 400
 
-                sql = "INSERT INTO `errors`(`document_no`, `sentence_no`, `code`, `text`) VALUES (%s, %s, %s, %s);"
+                sql = "INSERT INTO `errors`(`document_no`, `sentence_no`, `code`, `position`, `length`, `text`) VALUES (%s, %s, %s, %s, %s, %s);"
                 try:
-                    conn.execute(sql, (no, sentence_no, code, text))
+                    conn.execute(sql, (no, sentence_no, code, position, length, text))
                     created_error_no = conn.cursor.lastrowid
                     conn.execute("UPDATE `documents` SET `updated_time`=CURRENT_TIMESTAMP WHERE `no`=%s", (no))
                     conn.commit()
