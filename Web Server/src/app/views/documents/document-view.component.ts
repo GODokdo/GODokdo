@@ -13,13 +13,14 @@ export class DocumentViewComponent implements OnInit {
   errorForm = new FormGroup(
     { sentence_no: new FormControl(''), text: new FormControl(''), code: new FormControl(0), position: new FormControl(0), length: new FormControl(0) }
   );
-
+  selected_error = null;
   @ViewChild('primaryModal') public primaryModal: ModalDirective;
   private no: number;
   constructor(route: ActivatedRoute, public api: ApiService, private elRef: ElementRef) {
     this.no = route.snapshot.params['no'];
 
   }
+
   isCollapsed: boolean = false;
   selectText() {
     var selectionText;
@@ -52,10 +53,10 @@ export class DocumentViewComponent implements OnInit {
       alert(responseBody.error);
     });
   }
+
   addError(sentence_no, error_text, position) {
     error_text = error_text.trim()
     this.errorForm.controls.sentence_no.setValue(sentence_no);
-    this.errorForm.controls.code.setValue(0);
     this.errorForm.controls.text.setValue(error_text);
     this.errorForm.controls.position.setValue(position);
     this.errorForm.controls.length.setValue(error_text.length);
@@ -67,6 +68,13 @@ export class DocumentViewComponent implements OnInit {
     this.primaryModal.show();
   }
 
+  deleteError(error_no) {
+    if (confirm("정말 에러 라벨을 제거하시겠습니까?")) {
+      this.api.deleteDocumentError(this.no, error_no).subscribe((responseBody) => {
+      });
+    }
+
+  }
   selected_span = null;
   public result = null;
   public error_codes = [];

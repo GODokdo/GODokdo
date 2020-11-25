@@ -9,31 +9,34 @@
               새로운 URL 혹은 멀티미디어를 등록하면 서버는 자동으로 데이터를 수집하고 표기 오류를 검출합니다. 이 과정이 완료되면 문서는 <a href="https://adblockplus.org/en/bugs" class="alert-link">'labeled'</a> 상태가 됩니다.
               <br>여기에서 사용자들이 검출 결과를 검증하면 해당 데이터는 <a href="https://adblockplus.org/en/bugs" class="alert-link">'verified'</a>로 분류되어 인공지능 학습 데이터에 자동으로 반영됩니다.
             </div>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Title</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr [routerLink]="['/documents/view', item.no]" *ngFor="let item of documents">
-                  <td>{{item.no}}</td>
-                  <td>
-                    <span class="badge badge-warning" *ngIf="item.errors.length != 0">{{item.errors.length}} Errors</span>
-                    <div *ngIf="item.title == null">{{item.url}}</div>
-                        {{item.title}} 
-                        
+            <div class="table-responsive">
+              <table class="table table-hover table-striped">
+                <thead>
+                  <tr>
+                    <th class="text-center">No</th>
+                    <th class="text-center">Title</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr [routerLink]="['/documents/view', item.no]" *ngFor="let item of documents">
+                    <td>{{item.no}}</td>
+                    <td>
+                      <span class="badge badge-warning" *ngIf="item.errors.length != 0">{{item.errors.length}} Errors</span>
+                      <span class="badge badge-success" *ngIf="item.errors.length == 0">No Errors</span>
+                      <div *ngIf="item.title == null">{{item.url}}</div>
+                          {{item.title}} 
+                          
+                      </td>
+                    <td class="text-center">{{item.status}}</td>
+                    <td class="text-center">
+                      {{item.created_time}}
                     </td>
-                  <td>{{item.status}}</td>
-                  <td>
-                    {{item.created_time}}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <ul class="pagination">
               <li class="page-item"><a class="page-link" href="#">Prev</a></li>
               <li class="page-item active">

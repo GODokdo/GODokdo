@@ -337,5 +337,6 @@ def route(api):
                 if (conn.affected_row == 0):
                     return {'error': '삭제할 내용을 찾지 못했습니다.'}, 404
                 else:
+                    conn.execute("UPDATE `documents` SET `updated_time`=CURRENT_TIMESTAMP WHERE `no`=%s", (no))
                     conn.commit()
                     return {'deleted_error_no': error_no}, 200

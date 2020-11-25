@@ -104,13 +104,16 @@
         <alert type="success" dismissible="true" *ngIf="getStatusLevel() == 2"><i class="fa fa-info-circle"></i> 서버에서 인공지능을 통해 오류 표기를 검출하고 있습니다. 조금만 기다리면 자동으로 페이지에 반영됩니다.</alert>
         <alert type="danger" dismissible="true" *ngIf="getStatusLevel() > 2"><i class="fa fa-warning"></i> 혹시 검출되지 않은 표기 오류가 있나요? 문제가 있는 텍스트를 드래그하여 오류
           표시를 추가할 수 있습니다.</alert>
-        <ng-template #popTemplateHtml>여기다가 간단한 설명 + '더보기' 메뉴 표시
+        <ng-template #popTemplateHtml>
+          고유 번호: {{selected_error.no}} <a (click)="deleteError(selected_error.no)" href="javascript:void(0)">(표기 오류 제거)</a><br><br>
+          <div class="error_explanation">{{selected_error.explanation}}</div> 
+           <a href="#section1">더 자세히</a>
         </ng-template>
         <div>
           <span *ngFor="let sentence of contents" class="sentence">
             <div *ngIf="sentence.length == 1 && sentence[0]['text'].length == 0"><br>
             </div>
-            <div *ngFor="let item of sentence" style="display: inline;" class="text" [id]="'sentence_' + item.sentence_no"><span *ngIf="item.tag == 'text'" class="text">{{item.text}}</span><span *ngIf="item.tag == 'error'" class="text h" [popover]="popTemplateHtml" [popoverTitle]="item.error.name">{{item.text}}</span></div>
+            <div *ngFor="let item of sentence" style="display: inline;" class="text" [id]="'sentence_' + item.sentence_no"><span *ngIf="item.tag == 'text'" class="text">{{item.text}}</span><span *ngIf="item.tag == 'error'" class="text h" [popover]="popTemplateHtml" [popoverTitle]="item.error.name" container="body" (click)="selected_error = item.error">{{item.text}}</span></div>
           </span>
         </div>
       </div>
@@ -121,7 +124,7 @@
       <div>
         <span *ngFor="let sentence of contents" class="sentence">
           <div *ngIf="sentence.length != 1 || sentence[0]['text'].length != 0">
-            <div *ngFor="let item of sentence" style="display: inline;" class="text" [id]="'sentence_' + item.sentence_no"><span *ngIf="item.tag == 'text'" class="text">{{item.text}}</span><span *ngIf="item.tag == 'error'" class="text h" [popover]="popTemplateHtml" [popoverTitle]="item.error.name">{{item.text}}</span></div>
+            <div *ngFor="let item of sentence" style="display: inline;" class="text" [id]="'sentence_' + item.sentence_no"><span *ngIf="item.tag == 'text'" class="text">{{item.text}}</span><span *ngIf="item.tag == 'error'" class="text h" [popover]="popTemplateHtml" [popoverTitle]="item.error.name" container="body" (click)="selected_error = item.error">{{item.text}}</span></div>
             <br>{{translate_contents[sentence[0].sentence_no]}}
           </div>
           <br>
@@ -147,12 +150,15 @@
       </div>
   </tabset>
   
-
-  <div class="card">
-    <div class="card-header">
-      10014 - ** 표기 오류 (이런식으로?)
-    </div>
-    <div class="card-body">sd
+  <div class="row">
+    <div class="col-sm-12 col-md-12" *ngFor="let item of result.errors" >
+      <div class="card">
+        <div class="card-header">
+          {{item.code}} - {{item.name}}
+        </div>
+        <div class="card-body">{{item.explanation}}
+        </div>
+      </div>
     </div>
   </div>
 </div>

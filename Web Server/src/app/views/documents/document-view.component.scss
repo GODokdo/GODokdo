@@ -47,6 +47,21 @@ div.url {
     margin-top: 1.3rem;
 }
 
+div.sentence:not(:first-child) {
+  margin-top:  0.6rem;
+  
+}
+.card-footer button.btn-success {
+  margin-left: 5px;
+}
+.error_explanation {      
+  overflow:hidden;
+  text-overflow:ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+}
  // Colours -----------------------------------------
 $grey:  #777;
 $grey2: #dfe3e4;
