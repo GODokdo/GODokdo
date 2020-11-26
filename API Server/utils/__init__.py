@@ -8,13 +8,15 @@ def postData():
         return request.json
     return request.form.to_dict(flat=True)
 
-def postDataGet(key, default=None):
+def postDataGet(key, default=None, typedef = None):
     data = postData()
     if key in data:
         if type(data[key]) is str and len(data[key]) == 0:
             return default
-
-        return data[key]
+        if typedef is None: 
+            return data[key]
+        else:
+            return typedef(data[key])
     else:
         return default
 

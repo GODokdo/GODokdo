@@ -268,10 +268,10 @@ def route(api):
         @documents.response(409, 'Conflict')
         def post(self, no):
             sentence_no = postDataGet("sentence_no", None)
-            code = postDataGet("code", None)
+            code = postDataGet("code", None, int)
             text = postDataGet("text", "").strip()
-            position = postDataGet("position", None)
-            length = postDataGet("length", None)
+            position = postDataGet("position", None, int)
+            length = postDataGet("length", None, int)
             if (sentence_no == None):
                 return {'error': 'sentence_no는 필수로 입력해야합니다.'}, 400
             if (code == None):
@@ -304,6 +304,18 @@ def route(api):
                     print('text_predicted', text_predicted)
                     print('text', text)
                     return {'error': 'position, length 정보와 입력된 키워드가 일치하지 않습니다. (' + text_predicted + ')', 'text_predicted':text_predicted}, 400
+
+                # 이미 등록된 키워드중에 겹치는 구간이 있는지 확인
+                
+                errors = conn.execute("SELECT `position`, `length` FROM `errors` where `document_no`=%s and `sentence_no`=%s", (no, sentence_no))
+                error_mask = {}
+                for i in errors:
+                    for j in range(i['position'], i['position'] + i['length']):
+                        error_mask[j] = 1
+                
+                for j in range(position, position + length):
+                    if j in error_mask:
+                        return {'error': '라벨을 추가할 영역과 기존 오류 영역이 겹칩니다.'}, 409
 
                 sql = "INSERT INTO `errors`(`document_no`, `sentence_no`, `code`, `position`, `length`, `text`) VALUES (%s, %s, %s, %s, %s, %s);"
                 try:
