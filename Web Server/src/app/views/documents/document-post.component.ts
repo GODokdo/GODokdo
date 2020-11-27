@@ -15,11 +15,7 @@ export class DocumentPostComponent implements OnInit {
   );
 
   constructor(public api: ApiService, private router: Router) { }
-  public documents = [];
   ngOnInit(): void {
-    this.api.getDocumentList().subscribe((responseBody) => {
-      this.documents = responseBody['list'];
-    });
   }
   onSubmit() {    
     var title = this.textForm.controls.title.value;

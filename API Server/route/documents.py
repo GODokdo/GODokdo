@@ -78,21 +78,33 @@ def route(api):
         @login_required(documents)
         @documents.response(200, 'OK')
         @documents.param('status', '문서 상태에 따른 검색 필터')
+        @documents.param('limit', '한번에 볼 문서의 개수')
+        @documents.param('page', '페이지 번호')
         def get(self):
             with OpenMysql() as conn:
-                sql = "SELECT * FROM `document_list` ORDER BY `no` DESC"
-                status = request.args.get("status", "")
+                status = queryDataGet("status", "")
+                page = queryDataGet("page", 1, int)
+                limit = queryDataGet("limit", 999, int)
+                params = []
+                
+                sql = "WHERE 1=1"
                 if (len(status) > 0):
-                    sql = "SELECT * FROM `document_list` WHERE `status`=%s ORDER BY `no` DESC"
-                    result = conn.execute(sql, (status))
+                    sql += " and `status`=%s"
+                    params.append(status)
                 else:
-                    result = conn.execute(sql)
+                    sql += ""
+                params.append((page - 1) * limit)
+                params.append(limit)
+                result = conn.execute("SELECT * FROM `document_list` " + sql + " ORDER BY `no` DESC LIMIT %s, %s", params)
                 for i in range(0,len(result)):
                     if result[i]['errors'] == None:
                         result[i]['errors'] = []
                     else:
                         result[i]['errors'] = [int(i) for i in result[i]['errors'].split(',')]
-                return {'list': result}, 200
+                
+                
+                count = conn.execute("SELECT COUNT(*) as 'count' FROM `document_list` " + sql, params[:-2])
+                return {'list': result, 'count': count[0]['count']}, 200
 
         @as_json
         @login_required(documents)    
@@ -152,14 +164,15 @@ def route(api):
 
                 document = result[0]
                 sql = "SELECT `errors`.`no`, `errors`.`code`, `sentence_no`, name, text, explanation, `position`, `length` FROM `errors` join `error_types` on `errors`.`code` = `error_types`.`code` where `document_no`=%s"
-                result = conn.execute(sql, (no))
+                errors = conn.execute(sql, (no))
+
                 if (content_type == 'array'):
                     if (document['contents'] is None):
                         document['contents'] = []
                     else:
                         document['contents'] = document['contents'].split('\n')
                 
-                return {'document' : document, 'errors': result, 'content-type':content_type}, 200
+                return {'document' : document, 'errors': errors, 'content-type':content_type}, 200
 
         @as_json
         @login_required(documents)
