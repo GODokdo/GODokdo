@@ -41,12 +41,23 @@ model1.load_state_dict(torch.load("model_0.bin"))
 model1.eval()
 
 while True:
-    documents =  api.getDocumentList(status='collected')
+    try:
+        documents =  api.getDocumentList(status='collected')
+    except:
+        print("에러")
+        time.sleep(1)
+        continue
     for item in documents:
         document_no = item['no']
-        document = api.getDocument(document_no)
-        
+        try:
+            document = api.getDocument(document_no)
+        except:
+            print("에러 2")
+            time.sleep(1)
+            continue
         print(document_no, "번 문서 열람")
+        if (document['document']['contents'] is None):
+            continue
         sentences = split_document(document['document']['contents'], [])
         for sentence in sentences:
             sentence_no = getInformationFromSentence(sentence)['sentence_no'] - 2 # padding
