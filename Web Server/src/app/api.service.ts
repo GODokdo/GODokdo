@@ -38,6 +38,15 @@ export class ApiService {
     return this.httpClient.post("https://api.easylab.kr/document", { "title": title, "contents": contents }, { 'headers': { 'authorization': authorization } });
   }
 
+
+  addDocumentFromImage(title, file: File) {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("file", file);
+    console.log(file.size);
+    return this.httpClient.post("https://api.easylab.kr/document", formData, { 'headers': { 'authorization': authorization } });
+  }
+
   modifyDocumentFromText(no, status) {
     return this.httpClient.put("https://api.easylab.kr/document/" + no, { "status": status}, { 'headers': { 'authorization': authorization } });
   }

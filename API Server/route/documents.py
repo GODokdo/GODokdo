@@ -1,10 +1,10 @@
-from flask import request
+from flask import request, send_file
 import werkzeug
 werkzeug.cached_property = werkzeug.utils.cached_property
 from flask_restplus import Resource
 from utils import *
 from nltk import tokenize
-
+import os
 def reset():
     with OpenMysql() as conn:
         sql = "SELECT * FROM `documents` ORDER BY `no` DESC"
@@ -126,21 +126,30 @@ def route(api):
             status = "collected"
             with OpenMysql() as conn:
                 sql = "INSERT INTO `documents`(url, title, contents, status) VALUES (%s, %s, %s, %s);"
-                if url is not None:
-                    if len(conn.execute('SELECT no FROM `documents` WHERE `url`=%s',(url))) != 0:
-                        return {'error': '이미 등록된 URL 문서입니다.'}, 409
-                    if (title is None) != (contents is None):
-                        return {'error': 'title과 contents을 모두 채우거나 둘다 채우지 않아야합니다.'}, 400
-
-                    if title is None or contents is None:
-                        status = "registered"
-
+                if len(request.files) > 0:
+                    status = "registered"
+                    if title is None:
+                        return {'error': 'title은 필수 항목입니다.'}, 400
                 else:
-                    status = "collected"
-                    if title is None or contents is None:
-                        return {'error': 'URL 형식으로 등록하는 경우가 아니라면 제목과 본문을 필수로 추가해야합니다.'}, 400
+                    if url is not None:
+                        if len(conn.execute('SELECT no FROM `documents` WHERE `url`=%s',(url))) != 0:
+                            return {'error': '이미 등록된 URL 문서입니다.'}, 409
+                        if (title is None) != (contents is None):
+                            return {'error': 'title과 contents을 모두 채우거나 둘다 채우지 않아야합니다.'}, 400
+
+                        if title is None or contents is None:
+                            status = "registered"
+
+                    else:
+                        status = "collected"
+                        if title is None or contents is None:
+                            return {'error': 'URL 형식으로 등록하는 경우가 아니라면 제목과 본문을 필수로 추가해야합니다.'}, 400
+                        
                 conn.execute(sql, (url, title, contents, status))
                 conn.commit()
+                if len(request.files) > 0:         
+                    request.files['file'].save("./upload/" + str(conn.cursor.lastrowid))
+
                 return {
                     'created_document_no': conn.cursor.lastrowid,
                     'created_document_url': 'https://' + request.host  + '/document/' + str(conn.cursor.lastrowid),
@@ -171,8 +180,10 @@ def route(api):
                         document['contents'] = []
                     else:
                         document['contents'] = document['contents'].split('\n')
-                
-                return {'document' : document, 'errors': errors, 'content-type':content_type}, 200
+                file = None
+                if (os.path.isfile("./upload/" + str(no))):
+                    file = 'https://' + request.host  + '/document/' + str(no) + "/file"
+                return {'document' : document, 'errors': errors, 'content-type':content_type, 'file':file}, 200
 
         @as_json
         @login_required(documents)
@@ -239,6 +250,14 @@ def route(api):
             return {'success' : True}, 201
                 #    conn.execute("UPDATE `documents` SET `updated_time`=CURRENT_TIMESTAMP WHERE `no`=%s", (no))
                 #    conn.commit()
+
+    @documents.route('/<int:no>/file')
+    @documents.param('no', '문서 번호')
+    @documents.response(200, 'OK')
+    @documents.response(404, 'Not Found')
+    class Resource_documents_no(Resource):
+        def get(self, no):
+            return send_file("../upload/" + str(no), mimetype='image/gif')
 
     @documents.route('/<int:no>/status')
     @documents.param('no', '문서 번호')

@@ -7,12 +7,6 @@
       </div>
       <div class="card-body">
           <div class="form-group row">
-            <label class="col-md-3 col-form-label">Static</label>
-            <div class="col-md-9">
-              <p class="form-control-static">Username</p>
-            </div>
-          </div>
-          <div class="form-group row">
             <label class="col-md-3 col-form-label" for="text-input">제목</label>
             <div class="col-md-9">
               <input type="text" id="text-input" name="text-input" class="form-control" placeholder="Text" formControlName="title">
@@ -23,6 +17,34 @@
             <label class="col-md-3 col-form-label" for="textarea-input">본문 내용</label>
             <div class="col-md-9">
               <textarea id="textarea-input" name="textarea-input" rows="9" class="form-control" placeholder="Content.." formControlName="contents"></textarea>
+            </div>
+          </div>
+      </div>
+      <div class="card-footer">
+        <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-dot-circle-o"></i> Submit</button>
+        <button type="reset" class="btn btn-sm btn-danger"><i class="fa fa-ban"></i> Reset</button>
+      </div>
+    </div>
+  </form>
+
+
+  <form class="form-horizontal" [formGroup]="fileForm"  (ngSubmit)="onSubmitFile()">
+    <div class="card">
+      <div class="card-header">
+        <strong>분석 요청작업</strong> - 이미지 기반
+      </div>
+      <div class="card-body">
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="text-file-input">제목</label>
+            <div class="col-md-9">
+              <input type="text" id="text-file-input" name="text-file-input" class="form-control" placeholder="Text" formControlName="title">
+              <span class="help-block">해당 필드는 오직 문서를 구분하는 용도로 활용됩니다.</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="file-input">이미지 업로드</label>
+            <div class="col-md-9">
+              <input type="file" id="file-input" name="file-input" formControlName="file"  (change)="onFileChange(fileInput.files)" #fileInput>
             </div>
           </div>
       </div>

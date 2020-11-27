@@ -131,10 +131,13 @@
         </span>
       </div>
     </tab>
-    <tab>
+    <tab *ngIf="result.file"> 
       <ng-template tabHeading><i class="icon-calculator"></i> 이미지
       </ng-template>
-      </tab>
+      <div>
+        <img *ngIf="result.file" [src]="result.file" style="width: 100%;">
+      </div>
+    </tab>
       <div class="card-footer">
         <button type="button" class="btn btn-primary" (click)="isCollapsed = !isCollapsed">
           <div *ngIf="isCollapsed">원문 펴기</div>
