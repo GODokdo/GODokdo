@@ -22,6 +22,9 @@ from api import *
 from preprocessing import *
 from dataloader import *
 from model import *
+from PIL import Image
+from io import BytesIO
+import pytesseract
 
 api = APIDokdo(config.API_KEY)
 original_data_json = api.getTrainingData()
@@ -40,21 +43,43 @@ model1.to(device)
 model1.load_state_dict(torch.load("model_0.bin"))
 model1.eval()
 
-while True:
+
+def getDocuments(*args, **kwargs):
+    result = []
     try:
-        documents =  api.getDocumentList(status='collected')
+        documents =  api.getDocumentList(*args, **kwargs)
     except:
-        print("에러")
         time.sleep(1)
-        continue
+        return
+
     for item in documents:
         document_no = item['no']
         try:
             document = api.getDocument(document_no)
+            result.append(document)
         except:
-            print("에러 2")
             time.sleep(1)
             continue
+
+    return result
+    
+def image_ocr():
+    for document in getDocuments(status='registered'):
+        document_no = document['document']['no']
+        print(document_no, "번 문서 열람")
+        if 'file' in document and document['file'] is not None:
+            r = requests.get(document['file'], stream=True)
+            if r.status_code == 200:
+                image = Image.open(BytesIO(r.content))
+                string = pytesseract.image_to_string(image, lang='eng')
+                image.close()
+            if (len(string.strip()) == 0):
+                string = "Not Found"
+            api.updateDocument(document_no, 'collected', title = document['document']['title'], contents=string)
+
+def text_ai():
+    for document in getDocuments(status='collected'):
+        document_no = document['document']['no']
         print(document_no, "번 문서 열람")
         if (document['document']['contents'] is None):
             continue
@@ -116,4 +141,7 @@ while True:
                     else:
                         break
         api.updateDocument(document_no, 'labeled')
+while True:
+    image_ocr()
+    text_ai()
     time.sleep(1)
