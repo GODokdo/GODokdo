@@ -79,6 +79,7 @@ export class DocumentViewComponent implements OnInit {
   public result = null;
   public error_codes = [];
   public contents = [];
+  public distinct_errors = [];
   public translate_contents = [];
   public tryed = false;
   public previous_contents = "";
@@ -102,6 +103,19 @@ export class DocumentViewComponent implements OnInit {
       this.contents = []
       if (this.result.document.contents != null) {
         var errors = this.result.errors;
+        var error_arr = {}
+        errors.forEach(element => {
+          if (error_arr[element['code']] == null)
+          {
+            error_arr[element['code']] = {'code':  element['code'], 'name': element['name'], 'explanation': element['explanation'], 'count': 0}
+          }
+          error_arr[element['code']]['count'] += 1
+        });
+        this.distinct_errors = []
+        Object.keys(error_arr).forEach(element => {
+          this.distinct_errors.push(error_arr[element])
+        });
+
         errors = errors.sort(function (a, b): any {
             const dataA = a['position'];
             const dataB = b['position'];

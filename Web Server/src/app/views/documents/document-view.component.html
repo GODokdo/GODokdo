@@ -90,7 +90,7 @@
 
           <dt class="col-sm-3">검출된 표기 오류</dt>
           <dd class="col-sm-9">
-            한일 월드컵 표기 오류, 한일 월드컵 표기 오류
+            <span *ngFor="let item of distinct_errors; let isLast=last">{{item.name}}{{isLast ? '' : ','}} </span>
           </dd>
         </dl>
       </div>
@@ -152,14 +152,16 @@
         </button>
       </div>
   </tabset>
-  
+
   <div class="row">
-    <div class="col-sm-12 col-md-12" *ngFor="let item of result.errors" >
-      <div class="card">
+    <div class="col-sm-12 col-md-12" *ngFor="let item of distinct_errors" >
+      <div class="card card-accent-danger">
         <div class="card-header">
           {{item.code}} - {{item.name}}
         </div>
-        <div class="card-body">{{item.explanation}}
+        <div class="card-body">
+          검출된 표기 오류: {{item.count}}개 <br><br>
+          {{item.explanation}}
         </div>
       </div>
     </div>
