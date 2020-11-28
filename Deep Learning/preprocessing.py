@@ -117,13 +117,18 @@ def preprocessing(text, y_class, y_keyword, position, length, error_index):
     offsets = main.offsets
     
     # Pad sequence if its length < `max_len`
-    padding_length = 380 - len(ids)
+    max_len = 380
+    padding_length = max_len - len(ids)
     if padding_length > 0:
         ids = ids + ([0] * padding_length)
         mask = mask + ([0] * padding_length)
         token_type_ids = token_type_ids + ([0] * padding_length)
-        padding_length = 380 - len(offsets)
         offsets = offsets + ([(0, 0)] * padding_length)
+    elif padding_length < 0:
+        ids = (ids + ([0] * padding_length))[0:max_len - 1] + [102]
+        mask = mask[0:max_len]
+        token_type_ids = token_type_ids[0:max_len]
+        offsets = (offsets)[0:max_len - 1] + [(0, 0)]
         
     temp = []
     temp = [0] * len(class_list)
