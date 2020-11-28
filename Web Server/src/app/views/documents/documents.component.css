@@ -2,12 +2,6 @@ td:hover {
     cursor: pointer;
 }
 
-button.search {
-    width: 100%;
-    height: calc(1.5em + 0.75rem + 2px);
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
-}
 
 .alert {
     margin-bottom: 0.7rem;
@@ -29,4 +23,17 @@ label {
 .badge-info {
     color: #23282c;
     background-color: #76d0eb;
+}
+
+.form-group.row.col-sm-3 {
+    min-width: 28em;
+}
+.col-sm-1 {
+    min-width: 12em;
+}
+button.search {
+    width: 100%;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
 }
