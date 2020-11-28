@@ -1,3 +1,32 @@
 td:hover {
     cursor: pointer;
-}
+}
+
+button.search {
+    width: 100%;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.alert {
+    margin-bottom: 0.7rem;
+}
+label {
+    font-weight: 600;
+}
+
+.error_message{
+    font-weight: 400;
+
+}
+
+.badge {
+    margin-left: 0.5em;
+    padding: 0.30em 0.4em;
+
+}
+.badge-info {
+    color: #23282c;
+    background-color: #76d0eb;
+}

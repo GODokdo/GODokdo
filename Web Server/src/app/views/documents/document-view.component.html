@@ -110,7 +110,7 @@
            <a href="#section1">더 자세히</a>
         </ng-template>
         <div>
-          <span *ngFor="let sentence of contents" class="sentence">
+          <span *ngFor="let sentence of contents" class="sentence" ngPreserveWhitespaces>
             <div *ngIf="sentence.length == 1 && sentence[0]['text'].length == 0"><br>
             </div>
             <div *ngFor="let item of sentence" style="display: inline;" class="text" [id]="'sentence_' + item.sentence_no"><span *ngIf="item.tag == 'text'" class="text">{{item.text}}</span><span *ngIf="item.tag == 'error'" class="text h" [popover]="popTemplateHtml" [popoverTitle]="item.error.name" container="body" (click)="selected_error = item.error">{{item.text}}</span></div>

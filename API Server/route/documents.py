@@ -83,6 +83,8 @@ def route(api):
         def get(self):
             with OpenMysql() as conn:
                 status = queryDataGet("status", "")
+                error = queryDataGet("error", "")
+                crawling = queryDataGet("crawling", "")
                 page = queryDataGet("page", 1, int)
                 limit = queryDataGet("limit", 999, int)
                 params = []
@@ -91,8 +93,20 @@ def route(api):
                 if (len(status) > 0):
                     sql += " and `status`=%s"
                     params.append(status)
-                else:
-                    sql += ""
+                    
+                if (len(error) > 0):
+                    if error != "0":
+                        sql += " and `errors` LIKE %s"
+                        params.append("%" + error + "%")
+                    else:
+                        sql += " and `errors` is null and (`status`='labeled' or `status`='verified')"
+
+                    
+                if (len(crawling) > 0):
+                    sql += " and `crawling`=%s"
+                    params.append(crawling)
+
+
                 params.append((page - 1) * limit)
                 params.append(limit)
                 result = conn.execute("SELECT * FROM `document_list` " + sql + " ORDER BY `no` DESC LIMIT %s, %s", params)

@@ -4,11 +4,45 @@
             <i class="fa fa-align-justify"></i> 모든 문서
           </div>
           <div class="card-body">
-            <div class="alert alert-success">
-              <h4><i class="fa fa-warning"></i> Status of Document</h4>
-              새로운 URL 혹은 멀티미디어를 등록하면 서버는 자동으로 데이터를 수집하고 표기 오류를 검출합니다. 이 과정이 완료되면 문서는 <a href="https://adblockplus.org/en/bugs" class="alert-link">'labeled'</a> 상태가 됩니다.
-              <br>여기에서 사용자들이 검출 결과를 검증하면 해당 데이터는 <a href="https://adblockplus.org/en/bugs" class="alert-link">'verified'</a>로 분류되어 인공지능 학습 데이터에 자동으로 반영됩니다.
-            </div>
+            <form [formGroup]="searchForm" (ngSubmit)="onSubmit()">
+              <div class="row">
+                <div class="form-group row col-sm-3">
+                  <label class="col-md-3 col-form-label" for="status">문서 상태</label>
+                  <div class="col-md-9">
+                    <select class="form-control" id="status" formControlName="status">
+                      <option value="">사용 안함</option>
+                      <option value="registered">1. 수집 요청된 문서</option>
+                      <option value="collected">2. 인공지능 분석 대기중인 문서</option>
+                      <option value="labeled">3. 사용자 확인이 필요한 문서</option>
+                      <option value="verified">4. 처리 완료된 문서 (학습 데이터)</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row col-sm-3">
+                  <label class="col-md-3 col-form-label text-center" for="error">표기 오류</label>
+                  <div class="col-md-9">
+                    <select class="form-control" id="error" formControlName="error">
+                      <option value="">사용 안함</option>
+                      <option value="0">표기 오류 없음</option>
+                      <option *ngFor="let item of error_codes" [value]="item.code">{{item.code}} - {{item.name}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row col-sm-3">
+                  <label class="col-md-3 col-form-label text-center" for="crawling">등록 방법</label>
+                  <div class="col-md-9">
+                    <select class="form-control" id="crawling" formControlName="crawling">
+                      <option value="">사용 안함</option>
+                      <option value="0">수동 등록한 문서</option>
+                      <option value="1">자동 수집된 문서</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-sm-1">
+                  <button class="btn btn-sm btn-primary search" type="submit">검색</button>
+                </div>
+              </div><!--/.row-->
+            </form>
             <div class="table-responsive">
               <table class="table table-hover table-striped">
                 <thead>
@@ -23,11 +57,15 @@
                   <tr [routerLink]="['/documents/view', item.no]" *ngFor="let item of documents">
                     <td>{{item.no}}</td>
                     <td>
-                      <span class="badge badge-warning" *ngIf="item.errors.length != 0">{{item.errors.length}} Errors</span>
-                      <span class="badge badge-success" *ngIf="item.errors.length == 0">No Errors</span>
                       <div *ngIf="item.title == null">{{item.url}}</div>
-                          {{item.title}} 
-                          
+                      <span>{{item.title}}</span>
+                      <span class="badge badge-info" *ngIf="item.crawling == 0">User upload</span>
+                      
+                      <span class="badge badge-warning" *ngIf="item.errors.length != 0">{{item.errors.length}} Errors</span>
+                      <span class="badge badge-success" *ngIf="(item.status == 'labeled' || item.status == 'verified') && item.errors.length == 0">No Errors</span>
+                      <span *ngFor="let code of item.distinct_errors">
+                        <span class="badge badge-danger error_message">{{error_code_index[code]}}</span>
+                      </span>
                       </td>
                     <td class="text-center">{{item.status}}</td>
                     <td class="text-center">
@@ -38,9 +76,9 @@
               </table>
             </div>
             <ul class="pagination">
-              <li class="page-item"><a class="page-link" [routerLink]="['./']" [queryParams]="{'page':prev_no}">Prev</a></li>
-              <li class="page-item" *ngFor="let item of pages" [ngClass]="{'active': page_no == item}"><a class="page-link" [routerLink]="['./']" [queryParams]="{'page':item}">{{item}}</a></li>
-              <li class="page-item"><a class="page-link" [routerLink]="['./']" [queryParams]="{'page':next_no}">Next</a></li>
+              <li class="page-item"><a class="page-link" (click)="pageMove(prev_no)">Prev</a></li>
+              <li class="page-item" *ngFor="let item of pages" [ngClass]="{'active': page_no == item}"><a class="page-link" (click)="pageMove(item)">{{item}}</a></li>
+              <li class="page-item"><a class="page-link" (click)="pageMove(next_no)">Next</a></li>
             </ul>
           </div>
     </div>

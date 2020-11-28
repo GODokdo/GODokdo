@@ -13,6 +13,7 @@
     }
   },
   "angularCompilerOptions": {
+    "ngPreserveWhitespaces": true,
     "enableIvy": false
   },
   "files": [
