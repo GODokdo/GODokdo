@@ -1,0 +1,7 @@
+.DS_Store
+
+img/*
+
+yolo/Images/*
+yolo/train.txt
+
