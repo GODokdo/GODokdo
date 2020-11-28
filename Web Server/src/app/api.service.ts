@@ -54,4 +54,13 @@ export class ApiService {
   translate(text, src = "", dest = "") {
     return this.httpClient.get("https://api.easylab.kr/translate/from/google", { 'headers': { 'authorization': authorization }, 'params':{'src':src, 'dest': src, 'text':text}});
   }
+
+
+  getStatisticsDocument() {
+    return this.httpClient.get("https://api.easylab.kr/statistics/document", { 'headers': { 'authorization': authorization }});
+  }
+
+  getStatisticsError() {
+    return this.httpClient.get("https://api.easylab.kr/statistics/error", { 'headers': { 'authorization': authorization }});
+  }
 }

@@ -1,11 +1,38 @@
 import { Component, OnInit } from '@angular/core';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { ApiService } from '../../api.service';
 
 @Component({
   templateUrl: 'dashboard.component.html'
 })
 export class DashboardComponent implements OnInit {
+
+  public statistics_document = {};
+  public statistics_error = [];
+  public total_error = 0;
+
+  constructor(public api: ApiService) {
+     api.getStatisticsDocument().subscribe((responseBody) => { 
+       responseBody['list'].forEach(element => {
+        if (element['count'] == undefined) element['count'] = 0;
+        this.statistics_document[element['status']] = Number(element['count']);
+       });
+     });
+
+     api.getStatisticsError().subscribe((responseBody) => { 
+        this.total_error = responseBody['total'];
+        responseBody['list'].forEach(element => {
+          element['percentage'] = parseFloat(String((element['count'] / responseBody['total']) * 100)).toFixed(2);
+          element['percentage_int'] = parseFloat(String((element['count'] / responseBody['total']) * 100)).toFixed(0);
+        });
+        
+         this.statistics_error = responseBody['list']
+        console.log(this.statistics_error)
+      });
+  }
+
+
 
   radioModel: string = 'Month';
 
