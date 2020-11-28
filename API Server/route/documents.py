@@ -34,7 +34,8 @@ def preprocessing_url(url):
     return url
 
 def preprocessing_sentences(ori_text):
-    text = ori_text.strip() # 문서 앞뒤 여백 제거
+    text = ori_text.replace('  ', ' ')
+    text = text.strip() # 문서 앞뒤 여백 제거
     text = text.replace("\r","")
     # 일반적으로 해당 텍스트의 줄이 몇번씩 띄워져있는지 확인
     linespace = {}
