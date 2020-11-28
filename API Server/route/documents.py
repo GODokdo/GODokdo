@@ -150,7 +150,9 @@ def route(api):
             contents = postDataGet("contents", None)
             if contents is not None:
                 contents = preprocessing_sentences(contents)
-
+            if url is None:
+                if title.find("http") == 0:
+                    url = title
             if url is not None:
                 url = preprocessing_url(url)
                 if (url.find("http://") == -1 and url.find("https://")):
