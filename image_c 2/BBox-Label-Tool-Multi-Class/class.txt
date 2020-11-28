@@ -1,4 +1,0 @@
-error_east_sea 
-error_rising_sun
-map
-error_dokdo 

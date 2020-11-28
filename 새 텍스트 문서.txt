@@ -1,0 +1,71 @@
+conda activate base
+conda remove --name my_python_env --all -y
+conda create -n my_python_env python=3.7 -y
+conda activate my_python_env
+conda install pytorch torchvision torchaudio cudatoolkit=11.0 -c pytorch -y
+conda install -c conda-forge jupyterlab pandas -y
+pip install sklearn transformers 
+pip install ipywidgets
+
+conda install -c conda-forge nodejs -y
+jupyter labextension install @jupyter-widgets/jupyterlab-manager
+jupyter lab
+
+
+https://developer.nvidia.com/cuda-11.0-download-archive
+
+https://coding-groot.tistory.com/87
+https://developer.nvidia.com/rdp/cudnn-archive
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.0\bin
+
+환경변수까지
+D:
+cd D:\Workspace\공모전\감정분류
+
+
+PHP REST API 개발: https://thinkingfactory.tistory.com/168
+
+
+
+conda install -c conda-forge ipywidgets
+jupyter nbextension enable --py widgetsnbextension
+
+
+
+REST API 사용
+https://meetup.toast.com/posts/92
+pip install PyMySQL
+pip install -U flask-cors
+
+
+
+SELECT `documents`.`no`, `title`, `url`, `created_time`, `errors` , `status`
+from documents 
+left outer join
+(SELECT document_no, GROUP_CONCAT(DISTINCT `code` SEPARATOR ', ') as `errors` FROM `errors` GROUP BY `document_no`) as `errors_list`
+on `documents`.`no` = `errors_list`.`document_no`;
+
+SELECT `documents`.`no`, `title`, `url`, `created_time`, `errors` , `status`, `crawling`
+from documents 
+left outer join
+(SELECT document_no, GROUP_CONCAT(`code` SEPARATOR ', ') as `errors` FROM `errors` GROUP BY `document_no`) as `errors_list`
+on `documents`.`no` = `errors_list`.`document_no`;
+
+
+
+표기 오류 코드는 5자리 숫자를 사용
+표기 오류 (1)
+	한일 월드컵 (10100)
+		2002 한일 월드컵 당시 한일 양국의 신경전으로 까지 번졌던 공식명칭 문제가 FIFA의 결정에 따라, 2002 FIFA World Cup Korea/Japan, 2002 FIFA World Cup, FIFA World Cup, 이상 3가지를 사용하는 쪽으로 최종결론을 내렸으나, 이런 공식명칭을 왜곡하는 '2002 Japan-Korea'라는 명칭을 표기.   
+	동해 (10200)
+
+npm install -g @angular/cli
+
+# 번역기능 관련
+pip install googletrans
+
+문서 상태 (regiested, collected, labeled, verified)
+
+
+
+select name,count(name) as 'count' from `errors` join `error_types` on `errors`.`code`=`error_types`.`code` group by `errors`.`code`;

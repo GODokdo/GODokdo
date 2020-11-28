@@ -1,0 +1,1 @@
+xcopy ".\Web Server\dist\*.*" N:\dist\ /e /y
