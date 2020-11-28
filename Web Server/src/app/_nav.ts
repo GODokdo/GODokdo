@@ -12,40 +12,16 @@ export const navItems: INavData[] = [
   },
   {
     title: true,
-    name: '문서 검색'
+    name: '표기 오류 검출'
   },
   {
     name: '수집된 문서',
     url: '/documents/list',
     icon: 'icon-drop'
-  },
+  },  
   {
-    name: '자동 분류된 문서',
-    url: '/documents/auto-labeling-list',
-    icon: 'icon-drop'
-  },
-  {
-    title: true,
-    name: '문서 분석하기'
-  },
-  {
-    name: 'From URL',
-    url: '/theme/colors',
-    icon: 'icon-drop'
-  },
-  {
-    name: 'From Text',
+    name: '분석 요청',
     url: '/documents/post',
-    icon: 'icon-drop'
-  },
-  {
-    name: 'From Image',
-    url: '/theme/colors',
-    icon: 'icon-drop'
-  },
-  {
-    name: 'From Audio',
-    url: '/theme/colors',
     icon: 'icon-drop'
   },
   {
@@ -53,12 +29,7 @@ export const navItems: INavData[] = [
     name: '기타'
   },
   {
-    name: '표기 오류 정의',
-    url: '/theme/colors',
-    icon: 'icon-drop'
-  },  
-  {
-    name: '팀원 혹은 프로젝트 소개?',
+    name: '오류 분류 수정',
     url: '/theme/colors',
     icon: 'icon-drop'
   },  
