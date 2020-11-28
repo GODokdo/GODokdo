@@ -23,7 +23,12 @@ export class DocumentsComponent implements OnInit {
   public searchForm = new FormGroup(
     { status: new FormControl(''), error: new FormControl(''), crawling: new FormControl('') }
   );
-
+  public status_label = {
+    'registered': '문서 수집 요청',
+    'collected': 'AI 분석 요청',
+    'labeled': '검출 결과 확인 필요',
+    'verified': '분류 작업 완료'
+  }
   constructor(public api: ApiService, private route: ActivatedRoute, private router: Router) {
     this.route.queryParams.subscribe(params => {
       if (params['page'] != null)

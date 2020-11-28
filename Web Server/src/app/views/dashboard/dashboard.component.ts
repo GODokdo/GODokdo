@@ -11,7 +11,45 @@ export class DashboardComponent implements OnInit {
   public statistics_document = {};
   public statistics_error = [];
   public total_error = 0;
-
+  
+  public statistics_document_week = [
+    {
+      'date': '2020-11-29',
+      'error': 24,
+      'total': 333
+    },
+    
+    {
+      'date': '2020-11-28',
+      'error': 33,
+      'total': 145
+    },
+    {
+      'date': '2020-11-27',
+      'error': 4,
+      'total': 11
+    },
+    {
+      'date': '2020-11-26',
+      'error': 13,
+      'total': 14
+    },
+    {
+      'date': '2020-11-25',
+      'error': 3,
+      'total': 15
+    },
+    {
+      'date': '2020-11-24',
+      'error': 2,
+      'total': 5
+    },
+    {
+      'date': '2020-11-23',
+      'error': 4,
+      'total': 4
+    }
+  ];
   constructor(public api: ApiService) {
      api.getStatisticsDocument().subscribe((responseBody) => { 
        responseBody['list'].forEach(element => {
