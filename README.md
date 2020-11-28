@@ -27,6 +27,12 @@ We use "yolo4" for image detection and "CNN" for image classification, web crawl
   
   transfer with this tools to fit to "yolo4"
   
+  <img src="https://user-images.githubusercontent.com/44600037/100519111-36ae7800-31d9-11eb-96d6-e9edcc3a7133.png" width="300" ></img>
+
+
+  <img src="https://user-images.githubusercontent.com/44600037/100519113-3910d200-31d9-11eb-977f-ac5ead5ad753.png" width="300" ></img>
+
+  
   
 
 
