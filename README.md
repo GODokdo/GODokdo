@@ -53,4 +53,4 @@ We use "yolo4" for image detection and "CNN" for image classification, web crawl
    <img src="https://user-images.githubusercontent.com/44600037/100519113-3910d200-31d9-11eb-977f-ac5ead5ad753.png" width="300" ></img>
 
 
-
+- CNN (git hub : https://github.com/deepseasw/caltech101-image-cnn-classification/blob/master/Image%20CNN%20Classification.ipynb)
