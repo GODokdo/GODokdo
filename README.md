@@ -44,9 +44,11 @@ We use "yolo4" for image detection and "CNN" for image classification, web crawl
  - yolo-labeling-tool (git hub : https://github.com/YongWookHa/yolo-labeling-tool)
  
  tools use
+ 
    <img src="https://user-images.githubusercontent.com/44600037/100518828-6fe5e880-31d7-11eb-90f8-03b6054f6e43.png" width="300" ></img>
  
  make it to text file to fit the "yolo4" model
+ 
    <img src="https://user-images.githubusercontent.com/44600037/100519111-36ae7800-31d9-11eb-96d6-e9edcc3a7133.png" width="300" ></img>
    <img src="https://user-images.githubusercontent.com/44600037/100519113-3910d200-31d9-11eb-977f-ac5ead5ad753.png" width="300" ></img>
 
