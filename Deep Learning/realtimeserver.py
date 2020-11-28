@@ -50,7 +50,7 @@ def getDocuments(*args, **kwargs):
         documents =  api.getDocumentList(*args, **kwargs)
     except:
         time.sleep(1)
-        return
+        return []
 
     for item in documents:
         document_no = item['no']
@@ -62,7 +62,7 @@ def getDocuments(*args, **kwargs):
             continue
 
     return result
-    
+
 def image_ocr():
     for document in getDocuments(status='registered'):
         document_no = document['document']['no']
