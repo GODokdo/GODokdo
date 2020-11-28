@@ -1,5 +1,26 @@
 <div class="animated fadeIn">
 
+  <form class="form-horizontal" [formGroup]="urlForm"  (ngSubmit)="onSubmitURL()">
+    <div class="card">
+      <div class="card-header">
+        <strong>분석 요청작업</strong> - 웹사이트 기반
+      </div>
+      <div class="card-body">
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="url-input">사이트 URL</label>
+            <div class="col-md-9">
+              <input type="text" id="url-input" name="url-input" class="form-control" placeholder="Text" formControlName="url">
+              <span class="help-block">URL을 입력하면 서버에서 해당 웹페이지 정보를 자동으로 수집합니다.</span>
+            </div>
+          </div>
+      </div>
+      <div class="card-footer">
+        <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-dot-circle-o"></i> Submit</button>
+        <button type="reset" class="btn btn-sm btn-danger"><i class="fa fa-ban"></i> Reset</button>
+      </div>
+    </div>
+  </form>
+
   <form class="form-horizontal" [formGroup]="textForm"  (ngSubmit)="onSubmit()">
     <div class="card">
       <div class="card-header">

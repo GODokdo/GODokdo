@@ -57,8 +57,8 @@
                   <tr [routerLink]="['/documents/view', item.no]" *ngFor="let item of documents">
                     <td>{{item.no}}</td>
                     <td>
-                      <div *ngIf="item.title == null">{{item.url}}</div>
-                      <span>{{item.title}}</span>
+                      <span *ngIf="item.title == null">{{textLengthOverCut(item.url, 90)}}</span>
+                      <span>{{textLengthOverCut(item.title, 70)}}</span>
                       <span class="badge badge-info" *ngIf="item.crawling == 0">User upload</span>
                       
                       <span class="badge badge-warning" *ngIf="item.errors.length != 0">{{item.errors.length}} Errors</span>

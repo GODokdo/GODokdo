@@ -10,6 +10,9 @@ import { ApiService } from '../../api.service';
 })
 export class DocumentPostComponent implements OnInit {
 
+    urlForm = new FormGroup(
+      { url: new FormControl('')}
+    );
   textForm = new FormGroup(
     { title: new FormControl(''), contents: new FormControl('') }
   );
@@ -20,6 +23,15 @@ export class DocumentPostComponent implements OnInit {
   public file = null;
   constructor(public api: ApiService, private router: Router) { }
   ngOnInit(): void {
+  }
+  onSubmitURL() {
+    var url = this.urlForm.controls.url.value;
+    this.api.addDocumentFromURL(url).subscribe((responseBody) => {
+      this.router.navigateByUrl('/documents/view/' + responseBody['created_document_no']);
+    }, (response) => {
+      var responseBody = response.error;
+      alert(responseBody.error);
+    });
   }
   onSubmit() {    
     var title = this.textForm.controls.title.value;

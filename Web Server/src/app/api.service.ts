@@ -47,6 +47,11 @@ export class ApiService {
   }
 
 
+  addDocumentFromURL(url) {
+    return this.httpClient.post("https://api.easylab.kr/document", { "url": url}, { 'headers': { 'authorization': authorization } });
+  }
+
+
   addDocumentFromImage(title, file: File) {
     const formData = new FormData();
     formData.append("title", title);

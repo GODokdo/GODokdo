@@ -67,7 +67,24 @@ def preprocessing_sentences(ori_text):
     text = " ".join(sentences) # 모든 문장 이어붙이기
     texts = [i.strip() for i in tokenize.sent_tokenize(text)]
     text = "\n".join(texts).replace(" [#space_tag] ", "\n\n").replace("\n[#space_tag] ", "\n\n")
-    return text
+    
+    # 최종 결과물에서 긴 문장 나누기
+    texts = text.split('\n')
+    max_len = 400
+    for i in range(0, len(texts)):
+        result = []
+        now = ""
+        for j in texts[i].split(' '):
+            if len(now) + len(j) <= max_len:
+                now += ' ' + j
+            else:
+                result.append(now.strip())
+                now = j
+        if len(now) != 0:
+            result.append(now.strip())
+        texts[i] = '\n'.join(result)
+    
+    return '\n'.join(texts)
 
 def route(api):
     documents  = api.namespace('document', description='잘못된 사실을 기술하고있는 문서를 확인하거나 수정, 추가할 수 있습니다.')
@@ -128,7 +145,7 @@ def route(api):
         @documents.response(201, 'OK')
         @documents.response(409, 'Conflict')
         def post(self):
-            url = postDataGet("title", None)
+            url = postDataGet("url", None)
             title = postDataGet("title", None)
             contents = postDataGet("contents", None)
             if contents is not None:
@@ -136,6 +153,9 @@ def route(api):
 
             if url is not None:
                 url = preprocessing_url(url)
+                if (url.find("http://") == -1 and url.find("https://")):
+                    return {'error': 'url 형식이 올바르지 않습니다.'}, 400
+
 
             status = "collected"
             with OpenMysql() as conn:
