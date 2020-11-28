@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { DocumentPostComponent } from './document-post.component';
 import { DocumentViewComponent } from './document-view.component';
+import { DocumentsErrorComponent } from './documents-error.component';
 import { DocumentsComponent } from './documents.component';
 
 
@@ -15,6 +16,13 @@ const routes: Routes = [
       {
         path: '',
         redirectTo: 'list'
+      },
+      {
+        path: 'errors',
+        component: DocumentsErrorComponent,
+        data: {
+          title: '에러 표기 확인'
+        }
       },
       {
         path: 'post',

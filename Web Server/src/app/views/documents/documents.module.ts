@@ -12,10 +12,11 @@ import { AlertModule } from 'ngx-bootstrap/alert';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DocumentPostComponent } from './document-post.component';
+import { DocumentsErrorComponent } from './documents-error.component';
 
 
 @NgModule({
-  declarations: [DocumentsComponent, DocumentViewComponent, DocumentPostComponent],
+  declarations: [DocumentsComponent, DocumentViewComponent, DocumentPostComponent, DocumentsErrorComponent],
   imports: [
     CommonModule,
     DocumentsRoutingModule,

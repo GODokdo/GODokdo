@@ -23,16 +23,23 @@ def route(api):
         @errors.param('name', '잘못된 표기 분류 이름', 'formData')
         @errors.param('explanation', '잘못된 표기가 왜 잘못되었는지에 대한 상세한 설명', 'formData')
         @errors.response(201, 'OK')
+        @errors.response(400, 'Error')
         @errors.response(409, 'Conflict')
         def post(self):
-            data = postData()
+            
+            code = postDataGet("code", "").strip()
+            name = postDataGet("name", "").strip()
+            explanation = postDataGet("explanation", "").strip()
+            if (len(code) + len(name) + len(explanation) == 0):
+                    return {'error': '모든 칸을 입력해주세요.'}, 400
+
             with OpenMysql() as conn:
                 sql = "INSERT INTO `error_types`(code, name, explanation) VALUES (%s, %s, %s)"
                 try:
-                    conn.execute(sql, (data['code'], data['name'], data['explanation']))
+                    conn.execute(sql, (code, name, explanation))
                     conn.commit()
                     return {
-                        'created_code': data['code']
+                        'created_code': name
                     }, 201
                 except pymysql.err.IntegrityError:
                     return {'error': '이미 등록된 오류 코드입니다.'}, 409

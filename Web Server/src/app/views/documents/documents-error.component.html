@@ -1,0 +1,46 @@
+<div class="animated fadeIn">
+  <form class="form-horizontal" [formGroup]="textForm"  (ngSubmit)="onSubmit()">
+    <div class="card">
+      <div class="card-header">
+        <strong>새로운 표기 오류 카테고리 등록</strong>
+      </div>
+      <div class="card-body">
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="code-input">고유 번호</label>
+          <div class="col-md-9">
+            <input type="text" id="code-input" name="code-input" class="form-control" placeholder="Text" formControlName="code">
+          </div>
+        </div>         
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="name-input">카테고리 이름</label>
+          <div class="col-md-9">
+            <input type="text" id="name-input" name="name-input" class="form-control" placeholder="Text" formControlName="name">
+          </div>
+        </div>          
+
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="textarea-input">본문 내용</label>
+            <div class="col-md-9">
+              <textarea id="textarea-input" name="textarea-input" rows="9" class="form-control" placeholder="Content.." formControlName="text"></textarea>
+            </div>
+          </div>
+      </div>
+      <div class="card-footer">
+        <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-dot-circle-o"></i> Submit</button>
+        <button type="reset" class="btn btn-sm btn-danger"><i class="fa fa-ban"></i> Reset</button>
+      </div>
+    </div>
+  </form>
+  <div class="row">
+    <div class="col-sm-12 col-md-12" *ngFor="let item of errors" >
+      <div class="card card-accent-danger">
+        <div class="card-header">
+          <strong>{{item.code}}</strong>: {{item.name}}
+        </div>
+        <div class="card-body">
+          {{item.explanation}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

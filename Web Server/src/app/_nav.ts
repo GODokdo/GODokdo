@@ -30,7 +30,7 @@ export const navItems: INavData[] = [
   },
   {
     name: '오류 분류 수정',
-    url: '/theme/colors',
+    url: '/documents/errors',
     icon: 'icon-drop'
   },  
   {
