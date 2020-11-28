@@ -17,12 +17,12 @@ export const navItems: INavData[] = [
   {
     name: '수집된 문서',
     url: '/documents/list',
-    icon: 'icon-drop'
+    icon: 'fa fa-cloud-download'
   },  
   {
     name: '분석 요청',
     url: '/documents/post',
-    icon: 'icon-drop'
+    icon: 'fa fa-pencil'
   },
   {
     title: true,
@@ -31,7 +31,7 @@ export const navItems: INavData[] = [
   {
     name: '오류 분류 수정',
     url: '/documents/errors',
-    icon: 'icon-drop'
+    icon: 'fa fa-gear'
   },  
   {
     name: 'API document',
