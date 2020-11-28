@@ -4,4 +4,4 @@ img/*
 
 yolo/Images/*
 yolo/train.txt
-
+yolo/val.txt
