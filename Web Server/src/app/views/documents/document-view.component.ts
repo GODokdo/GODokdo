@@ -39,6 +39,11 @@ export class DocumentViewComponent implements OnInit {
     this.api.modifyDocumentFromText(this.no, status).subscribe((responeBody) => {this.Update()});
   }
 
+  detail(code) {
+    var element = document.getElementById(String(code))
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   errorSubmit() {
     var code = this.errorForm.controls.code.value;
     var position = this.errorForm.controls.position.value;

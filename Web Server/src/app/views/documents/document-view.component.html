@@ -107,7 +107,7 @@
         <ng-template #popTemplateHtml>
           고유 번호: {{selected_error.no}} <a (click)="deleteError(selected_error.no)" href="javascript:void(0)">(표기 오류 제거)</a><br><br>
           <div class="error_explanation">{{selected_error.explanation}}</div> 
-           <a href="#section1">더 자세히</a>
+           <a href="javascript:void(0)" (click)="detail(selected_error.code)">더 자세히</a>
         </ng-template>
         <div>
           <span *ngFor="let sentence of contents" class="sentence" ngPreserveWhitespaces>
@@ -156,7 +156,7 @@
   <div class="row">
     <div class="col-sm-12 col-md-12" *ngFor="let item of distinct_errors" >
       <div class="card card-accent-danger">
-        <div class="card-header">
+        <div class="card-header" [id]="item.code">
           {{item.code}} - {{item.name}}
         </div>
         <div class="card-body">
