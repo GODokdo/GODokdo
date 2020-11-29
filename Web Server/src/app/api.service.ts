@@ -76,6 +76,9 @@ export class ApiService {
     return this.httpClient.get("https://api.easylab.kr/statistics/document", { 'headers': { 'authorization': authorization }});
   }
 
+  getStatisticsDocumentByDate() {
+    return this.httpClient.get("https://api.easylab.kr/statistics/document/by-date", { 'headers': { 'authorization': authorization }});
+  }
   getStatisticsError() {
     return this.httpClient.get("https://api.easylab.kr/statistics/error", { 'headers': { 'authorization': authorization }});
   }

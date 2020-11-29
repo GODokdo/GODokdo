@@ -31,6 +31,26 @@ def route(api):
                     return {'list': result, 'total': total}, 200
 
 
+    @statistics.route('/document/by-date')
+    class Resource_statistics_document_date(Resource):
+        @as_json
+        @login_required(statistics)
+        @statistics.response(200, 'OK')
+        def get(self):
+            with OpenMysql() as conn:
+                sql = "SELECT * from count_documents_date ORDER BY date DESC"
+                result = conn.execute(sql)
+                total = 0
+                document_count = {}
+                for i in result:
+                    if (i['date'] not in document_count):
+                        document_count[i['date']] = {'date': i['date'], 'error': 0, 'total': 0}
+                    if (i['in_error'] == 1):
+                        document_count[i['date']]['error'] = i['count']
+
+                    document_count[i['date']]['total'] += i['count']
+                return {'list': list(document_count.values())[:7]}, 200
+
     @statistics.route('/error')
     class Resource_statistics_errors(Resource):
         @as_json
