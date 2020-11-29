@@ -54,7 +54,14 @@ Python-based AI solution for fixing from the error about the korea's information
  1. Confirm the result from web site whether that web site is clear or not.
  1. also, we can confirm with image.
 
+## Model Performance
 
+- Number of Sentences : 3980
+- training/test set split ratio: 8:2
+- Accuracy: 95%
+- Precision: 88.4%
+- Recall: 87.8%
+- TP,TN,FN,FP: 122, 641, 17, 16
 
 ## Future Work
 We are trying a new image object detection model called yolov4 and expect this to be able to detect errors that are not detected by text alone.
