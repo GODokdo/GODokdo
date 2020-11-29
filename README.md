@@ -77,3 +77,9 @@ However, the model's performance did not come out as expected bacause of lack of
 - [BERT - pytorch](https://github.com/codertimo/BERT-pytorch)
 - [BERT - span extraction example](https://www.kaggle.com/abhishek/bert-base-uncased-using-pytorch)
 - [pytesseract](https://pypi.org/project/pytesseract/)
+
+
+## Member
+* **Seunghwa, Lee** 
+* **Kyoyeon, Hong** 
+* **JiHyeon, Kim** 
