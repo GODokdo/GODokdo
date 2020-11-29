@@ -23,3 +23,9 @@ class APIDokdo:
           data={'status':status, 'title':title, 'contents':contents}, 
           headers=self.headers
         )
+    def AddDocument(self, URL):      
+        return requests.post(
+          self.apiurl + "/document",
+          data={'url':URL, 'crawling':1}, 
+          headers=self.headers
+        )

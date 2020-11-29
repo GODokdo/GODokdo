@@ -5,6 +5,8 @@ import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 import time
+import re
+import traceback
 from torch.optim import lr_scheduler
 
 from sklearn import model_selection
@@ -25,13 +27,7 @@ from model import *
 from PIL import Image
 from io import BytesIO
 import pytesseract
-capabilities = {
-  'browserName': 'chrome',
-  'chromeOptions':  {
-    'useAutomationExtension': False,
-    'args': ['--disable-infobars']
-  }
-}
+
 from urllib.parse import urlparse
 from selenium import webdriver
 from bs4 import BeautifulSoup as bs
@@ -39,11 +35,21 @@ from urllib.parse import quote_plus
 import time
 import json
 import base64
-driver = webdriver.Chrome(executable_path='chromedriver')
-def web_read(url):
+import threading
+
+def getdomain(url):
+    obj = urlparse(url)
+    domain = obj.netloc
+    return domain
+
+def web_read(driver, url):
     driver.get(url)
     time.sleep(3)
-    soup = bs(driver.find_element_by_xpath("//*").get_attribute("outerHTML"))
+    try:
+        soup = bs(driver.page_source)
+    except:
+        return {'title':url, 'contents': '일반적인 웹페이지 형식이 아님', 'image': None}
+    
     script_tag = soup.find_all(['script', 'style', 'header', 'footer', 'form','nav'])
 
     for script in script_tag:
@@ -54,16 +60,14 @@ def web_read(url):
         html_title = soup.find('title').string.strip()
     except:
         print("타이틀 없음")
-    obj = urlparse(url)
-    domain = obj.netloc
     if html_title is not None:
-        title = domain + " - " + html_title
+        title = getdomain(url) + " - " + html_title
     else:
         title = url
-    image = chrome_takeFullScreenshot()
+    image = chrome_takeFullScreenshot(driver)
     return {'title':title, 'contents': content, 'image': image }
 
-def chrome_takeFullScreenshot():
+def chrome_takeFullScreenshot(driver):
     def send(cmd, params):
         resource = "/session/%s/chromium/send_command_and_get_result" % driver.session_id
         url = driver.command_executor._url + resource
@@ -85,7 +89,8 @@ def chrome_takeFullScreenshot():
     send('Emulation.setDeviceMetricsOverride', metrics)
     screenshot = send('Page.captureScreenshot', {'format': 'png', 'fromSurface': True})
     send('Emulation.clearDeviceMetricsOverride', {})
-
+    if screenshot is None or 'data' not in screenshot:
+        return None
     return base64.b64decode(screenshot['data'])
 # print(web_read("https://www.britannica.com/place/Sea-of-Japan"))
 # exit()
@@ -130,8 +135,8 @@ def getDocuments(*args, **kwargs):
 def image_ocr():
     for document in getDocuments(status='registered'):
         document_no = document['document']['no']
-        print("image_ocr", document_no, "번 문서 열람")
         if 'file' in document and document['file'] is not None:
+            print("image_ocr", document_no, "번 문서 열람")
             r = requests.get(document['file'], stream=True)
             try:
                 if r.status_code == 200:
@@ -145,17 +150,20 @@ def image_ocr():
                 
                 print(document_no, "번 문서에서 이미지 열기 오류")
 
-def url_web():
+def url_web(driver):
     for document in getDocuments(status='registered'):
         document_no = document['document']['no']
         print("url_web", document_no, "번 문서 열람")
         if document['document']['url'] != None:
-            data = web_read(document['document']['url'])
+            data = web_read(driver, document['document']['url'])
             p = '../upload/' + str(document_no)
-            if os.path.isfile(p):
-                os.remove(p)
-            with open(p, 'wb') as f:
-                f.write(data['image'])
+            if data['image'] != None:
+                if os.path.isfile(p):
+                    os.remove(p)
+                with open(p, 'wb') as f:
+                    f.write(data['image'])
+            if (len(data['contents'].strip()) == 0):
+                data['contents'] = "Not Found"
             api.updateDocument(document_no, 'collected', title = data['title'], contents=data['contents'])
 
 def text_ai():
@@ -222,8 +230,91 @@ def text_ai():
                     else:
                         break
         api.updateDocument(document_no, 'labeled')
+
+def thread_image_ocr():
+    while True:
+        image_ocr()
+        time.sleep(1)
+
+def thread_text_ai():
+    while True:
+        text_ai()
+        time.sleep(1)
+
+options = webdriver.ChromeOptions()
+options.add_argument('mute-audio')
+def thread_url_web():
+    while True:
+        try:
+            driver = webdriver.Chrome(executable_path='chromedriver', options=options)
+            while True:
+                url_web(driver)
+                time.sleep(1)
+        except Exception as e:
+            print("URL_WEB 에러 발생\n", e)
+            traceback.print_stack()
+            traceback.print_exc()
+
+def thread_crawling():
+    while True:
+        try:
+            driver = webdriver.Chrome(executable_path='chromedriver', options=options)
+            while True:
+                crawling(driver)
+                time.sleep(11111)
+        except Exception as e:
+            print("크롤링 에러 발생\n", e)
+            traceback.print_stack()
+            traceback.print_exc()
+
+visited = {}
+def web_explorer(driver, URL, depth):
+    if (depth < 0):
+        return
+    if (URL in visited):
+        return
+    if (getdomain(URL).find("google") != -1 and URL.find("/search") == -1):
+        return
+    if (getdomain(URL).find("cache") != -1):
+        return
+    
+    print("크롤링", depth, URL)
+    visited[URL] = depth
+    driver.get(URL)
+    time.sleep(10)
+
+    try:
+        soup = bs(driver.page_source)
+    except:
+        return
+
+    # 현재 페이지 추가
+    api.AddDocument(URL)
+    links = soup.find_all(name="a", href=re.compile("https://") )
+
+    for i in links:
+        hyperlink = i.get('href')
+        if(hyperlink[0]=='h'):
+            web_explorer(driver, i.get('href'), depth - 1)
+    
+def crawling(driver):
+    return
+    web_explorer(driver, "https://www.google.com/search??hl=en&source=hp&q=sea of japan&start=0", 2)
+    web_explorer(driver, "https://www.google.com/search??hl=en&source=hp&q=takeshima&start=0", 2)
+    web_explorer(driver, "https://www.google.com/search??hl=en&source=hp&q=sea of japan&start=0", 2)
+    web_explorer(driver, "https://www.google.com/search??hl=en&source=hp&q=Korea was a part of China&start=0", 2)
+    web_explorer(driver, "https://www.google.com/search??hl=en&source=hp&q=Hermit Kingdom&start=0", 2)
+    web_explorer(driver, "https://www.google.com/search??hl=en&source=hp&q=Gutenberg&start=0", 2)
+    return
+
+threads = []
+threads.append(threading.Thread(target=thread_image_ocr))
+threads.append(threading.Thread(target=thread_text_ai))
+threads.append(threading.Thread(target=thread_url_web))
+threads.append(threading.Thread(target=thread_crawling))
+for i in threads:
+    i.start()
+
+
 while True:
-    image_ocr()
-    text_ai()
-    url_web()
     time.sleep(1)

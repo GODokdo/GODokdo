@@ -92,7 +92,7 @@ export class DocumentViewComponent implements OnInit {
     if (this.tryed) return;
     this.tryed = true;
     this.api.getDocumentFromNo(this.no, "array").subscribe((responseBody) => {
-      this.updated_time = responseBody['document']['updated_time'];
+      this.updated_time = String(responseBody['document']['updated_time']) +  responseBody['document']['status'];
       this.result = responseBody;
       if (this.previous_contents != String(this.result.document.contents))
       {
@@ -185,8 +185,10 @@ export class DocumentViewComponent implements OnInit {
     this.Update();
     this.interval = setInterval(() => {
       this.api.getDocumentStatus(this.no).subscribe((responseBody) => {
-        if (this.updated_time != responseBody['updated_time']) {
-          this.updated_time = responseBody['updated_time'];
+        console.log(this.updated_time)
+        console.log(String(responseBody['updated_time']) +  responseBody['status'])
+        if (this.updated_time != String(responseBody['updated_time']) +  responseBody['status'] ) {
+          this.updated_time = String(responseBody['updated_time']) +  responseBody['status'];
           this.Update();
         }
       });

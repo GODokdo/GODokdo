@@ -143,12 +143,14 @@ def route(api):
         @documents.param('url', '웹사이트 주소', 'formData')
         @documents.param('title', '본문 타이틀', 'formData')
         @documents.param('contents', '본문 내용', 'formData')
+        @documents.param('crawling', 'crawling', 'formData')
         @documents.response(201, 'OK')
         @documents.response(409, 'Conflict')
         def post(self):
             url = postDataGet("url", None)
             title = postDataGet("title", None)
             contents = postDataGet("contents", None)
+            crawling = postDataGet("crawling", 0)
             if contents is not None:
                 contents = preprocessing_sentences(contents)
             if url is None:
@@ -162,7 +164,7 @@ def route(api):
 
             status = "collected"
             with OpenMysql() as conn:
-                sql = "INSERT INTO `documents`(url, title, contents, status) VALUES (%s, %s, %s, %s);"
+                sql = "INSERT INTO `documents`(url, title, contents, status, crawling) VALUES (%s, %s, %s, %s, %s);"
                 if len(request.files) > 0:
                     status = "registered"
                     if title is None:
@@ -182,7 +184,7 @@ def route(api):
                         if title is None or contents is None:
                             return {'error': 'URL 형식으로 등록하는 경우가 아니라면 제목과 본문을 필수로 추가해야합니다.'}, 400
                         
-                conn.execute(sql, (url, title, contents, status))
+                conn.execute(sql, (url, title, contents, status, crawling))
                 conn.commit()
                 if len(request.files) > 0:         
                     request.files['file'].save("./upload/" + str(conn.cursor.lastrowid))
