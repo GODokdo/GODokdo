@@ -1,7 +1,6 @@
 # GODokdo
 
-Python-based AI web page.
-This site is for fixing from the error about the korea's information to correct one.
+Python-based AI solution for fixing from the error about the korea's information to correct one.
 
 ![image](https://user-images.githubusercontent.com/17453822/100536654-525f6000-3265-11eb-82fc-d4631dbcc4bf.png)
 ![image](https://user-images.githubusercontent.com/17453822/100536614-29d76600-3265-11eb-8d12-a8ca57bcfefa.png)
