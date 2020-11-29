@@ -31,7 +31,7 @@ Python-based AI solution for fixing from the error about the korea's information
 
   All activities go through this server. We tried to satisfy the REST API as much as possible. [API Document](https://api.easylab.kr/)
 
-### Deep Learning
+### Deep Learning Server
 
   It learns by receiving data from the API server. BERT was used as the word embedding model. We use the output of the two hidden layers of the BERT model as the embedding result. 
   
@@ -43,7 +43,7 @@ Python-based AI solution for fixing from the error about the korea's information
 
   The Angular framework was used to create the web server. Register new file, bring the registered new file and fill the sentence. This is a front-end system that allows users to communicate with the server.
 
-### Web crawling
+### Web Crawling Server
 
   To collect data from web page, we used python. There is a root keyword here. It collects new documents by stacking new urls(hyperlinks) to tree structure base on root keyword.
   
@@ -54,18 +54,19 @@ Python-based AI solution for fixing from the error about the korea's information
  1. Confirm the result from web site whether that web site is clear or not.
  1. also, we can confirm with image.
 
+
+
+## Future Work
+We use "yolo4" for image detection and "CNN" for image classification, web crawling,  . . . . .
+
 - image_c 2 (reference)
 
   yolo-labeling-tools.
   Python based labeling tools.
   Transfer with this tools to fit to "yolo4"
-
-
-## Future Work
-We use "yolo4" for image detection and "CNN" for image classification, web crawling,  . . . . .
-## 3. Reference
+  
  - yolo-labeling-tool (git hub : https://github.com/YongWookHa/yolo-labeling-tool)
- 
+
  tools use
  
    <img src="https://user-images.githubusercontent.com/44600037/100518828-6fe5e880-31d7-11eb-90f8-03b6054f6e43.png" width="300" ></img>
@@ -77,3 +78,13 @@ We use "yolo4" for image detection and "CNN" for image classification, web crawl
 
 
 - CNN (git hub : https://github.com/deepseasw/caltech101-image-cnn-classification/blob/master/Image%20CNN%20Classification.ipynb)
+
+
+
+
+## Reference
+- [Angular](https://github.com/angular/angular)
+- [Core free angular admin template](https://github.com/coreui/coreui-free-angular-admin-template)
+- [BERT - pytorch](https://github.com/codertimo/BERT-pytorch)
+- [BERT - span extraction example](https://www.kaggle.com/abhishek/bert-base-uncased-using-pytorch)
+- [pytesseract](https://pypi.org/project/pytesseract/)
