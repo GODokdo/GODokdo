@@ -59,7 +59,7 @@ Python-based AI solution for fixing from the error about the korea's information
 ## Future Work
 We are trying a new image object detection model called yolov4 and expect this to be able to detect errors that are not detected by text alone.
 ![image](https://user-images.githubusercontent.com/17453822/100537383-76be3b00-326b-11eb-8c69-09c7bd29b336.png)
-However, the model's performance did not come out as expected bacause of lack of data
+However, the model has low performance bacause of lack of data.
 
 **So, it was temporarily excluded from the service. But, if the opportunity arises, we will incorporate this into our solution!**
 
