@@ -1,24 +1,59 @@
 # GODokdo
 
-## 1. Overview
-
-Python based AI web page.
+Python-based AI web page.
 This site is for fixing from the error about the korea's information to correct one.
-We use "yolo4" for image detection and "CNN" for image classification, web crawling,  . . . . .
 
-- API Server
-
-  Via API Server, Deep learning, Web crawling connected.
-
-- Deep Learning
+![image](https://user-images.githubusercontent.com/17453822/100536654-525f6000-3265-11eb-82fc-d4631dbcc4bf.png)
+![image](https://user-images.githubusercontent.com/17453822/100536614-29d76600-3265-11eb-8d12-a8ca57bcfefa.png)
 
 
-- Web Scraper
+## Main Process 
 
+1. Users and web crawlers register various types of documents such as text, URL, and images.
 
-- Web Server
+1. Server automatically collects document information
+    - Text: Sentence separation
+    - URL: Web page information collection + conversion data into text.
+    - Image: Using tesseract, conversion img into text.
+    
+1. AI reads text and detects errors.
+
+1. Users can check the detected errors.
+      - Is this all right?
+      - Isn't it misclassified?
+      - This part was not detected.
+      - Everything is successful. Click the Done button.
+      
+1. The server stores that data. AI also reflects those documents in the deep learning process that runs periodically.
+
+## Subproject Overview
+
+### API Server
+
+  All activities go through this server. We tried to satisfy the REST API as much as possible. [API Document](https://api.easylab.kr/)
+
+### Deep Learning
+
+  It learns by receiving data from the API server. BERT was used as the word embedding model. We use the output of the two hidden layers of the BERT model as the embedding result. 
   
-  Register new file, bring the registered new file and fill the sentence.
+  And Our model is to predict [error categories (one-hot encoding), error keyword position, error keyword length(end_position)] through two additional layers.
+  
+  In addition, surrounding sentences are used together to predict. So our model can be expected to take the context into account.
+
+### Web Server
+
+  The Angular framework was used to create the web server. Register new file, bring the registered new file and fill the sentence. This is a front-end system that allows users to communicate with the server.
+
+### Web crawling
+
+  To collect data from web page, we used python. There is a root keyword here. It collects new documents by stacking new urls(hyperlinks) to tree structure base on root keyword.
+  
+
+## Usage
+
+ 1. Search from our web site via url.
+ 1. Confirm the result from web site whether that web site is clear or not.
+ 1. also, we can confirm with image.
 
 - image_c 2 (reference)
 
@@ -26,20 +61,9 @@ We use "yolo4" for image detection and "CNN" for image classification, web crawl
   Python based labeling tools.
   Transfer with this tools to fit to "yolo4"
 
-- upload
-  Image upload code.
-  
-- Web crawling
-  To collect data from web page, we used we crawling with python.
 
-## 2. Usage
-
- ### 1) Search from our web site via url.
- ### 2) Confirm the result from web site whether that web site is clear or not.
- ### 3) also, we can confirm with image.
-
-
-
+## Future Work
+We use "yolo4" for image detection and "CNN" for image classification, web crawling,  . . . . .
 ## 3. Reference
  - yolo-labeling-tool (git hub : https://github.com/YongWookHa/yolo-labeling-tool)
  
