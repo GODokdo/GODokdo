@@ -57,27 +57,16 @@ Python-based AI solution for fixing from the error about the korea's information
 
 
 ## Future Work
-We use "yolo4" for image detection and "CNN" for image classification, web crawling,  . . . . .
+We are trying a new image object detection model called yolov4 and expect this to be able to detect errors that are not detected by text alone.
+![image](https://user-images.githubusercontent.com/17453822/100537383-76be3b00-326b-11eb-8c69-09c7bd29b336.png)
+However, the model's performance did not come out as expected. 
 
-- image_c 2 (reference)
-
-  yolo-labeling-tools.
-  Python based labeling tools.
-  Transfer with this tools to fit to "yolo4"
-  
- - yolo-labeling-tool (git hub : https://github.com/YongWookHa/yolo-labeling-tool)
-
- tools use
- 
-   <img src="https://user-images.githubusercontent.com/44600037/100518828-6fe5e880-31d7-11eb-90f8-03b6054f6e43.png" width="300" ></img>
- 
- make it to text file to fit the "yolo4" model
- 
-   <img src="https://user-images.githubusercontent.com/44600037/100519111-36ae7800-31d9-11eb-96d6-e9edcc3a7133.png" width="300" ></img>
-   <img src="https://user-images.githubusercontent.com/44600037/100519113-3910d200-31d9-11eb-977f-ac5ead5ad753.png" width="300" ></img>
+**So, it was temporarily excluded from the service. But, if the opportunity arises, we will incorporate this into our solution!**
 
 
-- CNN (git hub : https://github.com/deepseasw/caltech101-image-cnn-classification/blob/master/Image%20CNN%20Classification.ipynb)
+- CNN (github : https://github.com/deepseasw/caltech101-image-cnn-classification/blob/master/Image%20CNN%20Classification.ipynb)
+
+- pytorch-YOLOv4 (github : https://github.com/Tianxiaomo/pytorch-YOLOv4)
 
 
 
